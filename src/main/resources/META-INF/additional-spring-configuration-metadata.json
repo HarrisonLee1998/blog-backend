@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "qiniu.Host",
+      "type": "java.lang.String",
+      "description": "Description for qiniu.Host."
+    },
+    {
+      "name": "qiniu.AccessKey",
+      "type": "java.lang.String",
+      "description": "Description for qiniu.AccessKey."
+    },
+    {
+      "name": "qiniu.SecretKey",
+      "type": "java.lang.String",
+      "description": "Description for qiniu.SecretKey."
+    },
+    {
+      "name": "qiniu.bucket",
+      "type": "java.lang.String",
+      "description": "Description for qiniu.bucket."
+    }
+  ]
+}

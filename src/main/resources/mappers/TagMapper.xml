@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.color.pink.dao.TagMapper">
+  <resultMap id="BaseResultMap" type="com.color.pink.pojo.Tag">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tag
+    where id = #{id,jdbcType=CHAR}
+  </delete>
+  <insert id="insert" parameterType="com.color.pink.pojo.Tag">
+    insert into tag (id, title, create_date, 
+      view_times)
+    values (#{id,jdbcType=CHAR}, #{title,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{viewTimes,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.color.pink.pojo.Tag">
+    update tag
+    set title = #{title,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      view_times = #{viewTimes,jdbcType=INTEGER}
+    where id = #{id,jdbcType=CHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select id, title, create_date, view_times
+    from tag
+    where id = #{id,jdbcType=CHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, title, create_date, view_times
+    from tag
+  </select>
+
+  <select id="selectAllTagTitle" resultType="java.lang.String">
+    SELECT title FROM tag
+  </select>
+
+  <insert id="addTags" parameterType="java.util.Set">
+    INSERT INTO tag(id, title, create_date, view_times)
+    VALUES
+    <foreach collection="tags" item="item" separator=",">
+      (#{item.id}, #{item.title}, #{item.createDate}, #{item.viewTimes})
+    </foreach>
+  </insert>
+</mapper>

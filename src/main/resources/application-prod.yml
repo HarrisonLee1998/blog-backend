@@ -1,0 +1,6 @@
+logging:
+  config: classpath:logging-back-prod.xml
+spring:
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:23306/blog?serverTimezone=Asia/Shanghai&useSSL=false&&characterEncoding=utf8

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.color.pink.dao.ArchiveMapper">
+  <resultMap id="BaseResultMap" type="com.color.pink.pojo.Archive">
+    <id column="title" jdbcType="VARCHAR" property="title" />
+    <result column="a_order" jdbcType="INTEGER" property="order" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
+    <result column="markdown" jdbcType="LONGVARCHAR" property="markdown" />
+    <result column="html" jdbcType="LONGVARCHAR" property="html" />
+    <association property="articleNums" select="com.color.pink.dao.ArticleMapper.countArticleByArchive" column="title"/>
+  </resultMap>
+
+  <resultMap id="BaseResultMap2" type="com.color.pink.pojo.Archive">
+    <id column="title" jdbcType="VARCHAR" property="title" />
+    <result column="a_order" jdbcType="INTEGER" property="order" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
+    <result column="markdown" jdbcType="LONGVARCHAR" property="markdown" />
+    <result column="html" jdbcType="LONGVARCHAR" property="html" />
+    <association property="articleNums" select="com.color.pink.dao.ArticleMapper.countArticleByArchive2" column="title"/>
+  </resultMap>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select title, create_date, view_times, markdown, html, a_order
+    from archive
+  </select>
+
+  <select id="selectAll2" resultMap="BaseResultMap2">
+    select title, create_date, view_times, markdown, html, a_order
+    from archive
+  </select>
+
+  <insert id="addArchive" parameterType="com.color.pink.pojo.Archive">
+    INSERT INTO archive VALUES
+    (#{title}, #{markdown}, #{html}, #{createDate}, #{order}, #{viewTimes})
+  </insert>
+</mapper>

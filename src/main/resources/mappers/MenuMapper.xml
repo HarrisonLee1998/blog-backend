@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.color.pink.dao.MenuMapper">
+  <resultMap id="BaseResultMap" type="com.color.pink.pojo.Menu">
+    <id column="title" jdbcType="VARCHAR" property="title" />
+    <id column="link" jdbcType="VARCHAR" property="link" />
+    <result column="is_open" jdbcType="INTEGER" property="isOpen" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="map">
+    delete from menu
+    where title = #{title,jdbcType=VARCHAR}
+      and link = #{link,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.color.pink.pojo.Menu">
+    insert into menu (title, link, is_open
+      )
+    values (#{title,jdbcType=VARCHAR}, #{link,jdbcType=VARCHAR}, #{isOpen,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.color.pink.pojo.Menu">
+    update menu
+    set is_open = #{isOpen,jdbcType=INTEGER}
+    where title = #{title,jdbcType=VARCHAR}
+      and link = #{link,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="map" resultMap="BaseResultMap">
+    select title, link, is_open
+    from menu
+    where title = #{title,jdbcType=VARCHAR}
+      and link = #{link,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select title, link, is_open
+    from menu
+  </select>
+</mapper>

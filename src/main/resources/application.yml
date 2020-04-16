@@ -1,0 +1,45 @@
+server:
+  port: 8080
+  tomcat:
+    remote-ip-header: X-Real-IP
+    protocol-header: X-ForWarded-Proto
+spring:
+  profiles:
+    active: dev
+  datasource:
+    username: root
+    password: LIzheng520!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    #   数据源其他配置
+    druid:
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+
+  mail:
+    properties.mail.smtp.ssl: true
+    host: smtp.163.com
+    username: 13540441065@163.com
+    password: LIzheng520
+
+mybatis:
+  # 指定全局配置文件位置
+  config-location: classpath:mybatis-config.xml
+  # 指定sql映射文件位置 可以是类路径下的，还可以是网络路径或者是磁盘路径
+  # 在xml配置文件中，可以通过resource和url分别指定不同的情况
+  mapper-locations: classpath:mappers/*.xml
+
+qiniu:
+  Host: harrison-blog.s3-cn-east-1.qiniucs.com
+  AccessKey: s2isdTfRNsqvGvE3ysU58S0UWCMRflkYhapdJTC2
+  SecretKey: yeJfZJCiqai7L9yyU6KFfRdDNF4WUGOgtN-pRXzY
+  Bucket: harrison-blog

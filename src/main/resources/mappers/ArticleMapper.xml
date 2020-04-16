@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.color.pink.dao.ArticleMapper">
+  <resultMap id="BaseResultMap" type="com.color.pink.pojo.Article">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="star" jdbcType="INTEGER" property="star" />
+    <result column="view_time" jdbcType="INTEGER" property="viewTime" />
+    <result column="is_open" jdbcType="INTEGER" property="isOpen" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="post_date" jdbcType="TIMESTAMP" property="postDate" />
+    <result column="last_update_date" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="archive_title" jdbcType="VARCHAR" property="archiveTitle" />
+    <result column="is_reward" jdbcType="INTEGER" property="isReward" />
+    <result column="markdown" jdbcType="LONGVARCHAR" property="markdown" />
+    <result column="html" jdbcType="LONGVARCHAR" property="html" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from article
+    where id = #{id,jdbcType=CHAR}
+  </delete>
+  <insert id="insert" parameterType="com.color.pink.pojo.Article">
+    insert into article (id, title, star, 
+      view_time, is_open, is_delete, 
+      post_date, last_update_date, archive_title, 
+      is_reward, markdown, html
+      )
+    values (#{id,jdbcType=CHAR}, #{title,jdbcType=VARCHAR}, #{star,jdbcType=INTEGER}, 
+      #{viewTime,jdbcType=INTEGER}, #{isOpen,jdbcType=INTEGER}, #{isDelete,jdbcType=INTEGER}, 
+      #{postDate,jdbcType=TIMESTAMP}, #{lastUpdateDate,jdbcType=TIMESTAMP}, #{archiveTitle,jdbcType=VARCHAR}, 
+      #{isReward,jdbcType=INTEGER}, #{markdown,jdbcType=LONGVARCHAR}, #{html,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.color.pink.pojo.Article">
+    update article
+    set title = #{title,jdbcType=VARCHAR},
+      star = #{star,jdbcType=INTEGER},
+      view_time = #{viewTime,jdbcType=INTEGER},
+      is_open = #{isOpen,jdbcType=INTEGER},
+      is_delete = #{isDelete,jdbcType=INTEGER},
+      post_date = #{postDate,jdbcType=TIMESTAMP},
+      last_update_date = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      archive_title = #{archiveTitle,jdbcType=VARCHAR},
+      is_reward = #{isReward,jdbcType=INTEGER},
+      markdown = #{markdown,jdbcType=LONGVARCHAR},
+      html = #{html,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=CHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select id, title, star, view_time, is_open, is_delete, post_date, last_update_date, 
+    archive_title, is_reward, markdown, html
+    from article
+    where id = #{id,jdbcType=CHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, title, star, view_time, is_open, is_delete, post_date, last_update_date, 
+    archive_title, is_reward, markdown, html
+    from article
+  </select>
+
+  <insert id="postArticle" parameterType="com.color.pink.pojo.Article">
+    INSERT INTO article VALUES
+    (#{id}, #{title}, #{markdown}, #{html}, #{star}, #{viewTimes}, #{isOpen}, #{isDelete},
+    #{postDate}, #{lastUpdateDate}, #{archiveTitle}, #{isReward})
+  </insert>
+
+  <select id="countArticleByArchive" parameterType="java.lang.String" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM article WHERE archive_title = #{archive} AND is_delete = 0
+  </select>
+
+  <select id="countArticleByArchive2" parameterType="java.lang.String" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0
+  </select>
+</mapper>

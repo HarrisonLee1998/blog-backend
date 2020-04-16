@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.color.pink.dao.BlogMapper">
+
+    <select id="countArticleByTag" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM article AS a, blog AS b
+        WHERE a.id=b.art_id
+            AND a.is_delete=0
+            AND b.tag_id=#{tagId}
+    </select>
+
+    <select id="countArticleByTag2" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM article AS a, blog AS b
+        WHERE a.id=b.art_id
+            AND a.is_delete=0 AND a.is_open=1
+            AND b.tag_id=#{tagId}
+    </select>
+
+    <select id="selectArticleByTag" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
+        SELECT a.id, a.title, a.html, a.markdown, a.star, a.view_time, a.post_date, a.last_update_date
+            a.is_reward, a.archive_title
+        FROM article AS a, blog AS b
+        WHERE a.id=b.art_id
+            AND a.is_delete=0 AND a.is_open=1
+            AND b.tag_id=#{tagId}
+    </select>
+
+    <!--用户端是不用查markdown的-->
+    <select id="selectArticleByTag2" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
+        SELECT a.id, a.title, a.html, a.star, a.view_time, a.post_date, a.last_update_date
+            a.is_reward, a.archive_title
+        FROM article AS a, blog AS b
+        WHERE a.id=b.art_id
+            AND a.is_delete=0 AND a.is_open=1
+            AND b.tag_id=#{tagId}
+    </select>
+
+    <insert id="addBlogs">
+        INSERT INTO blog
+        VALUES
+        <foreach collection="tagIds" item="tagId" separator=",">
+            (#{artId}, #{tagId})
+        </foreach>
+    </insert>
+</mapper>
