@@ -19,4 +19,6 @@ public interface TagMapper {
     Set<String> selectAllTagTitle();
 
     boolean addTags(@Param("tags") Set<Tag>tags);
+    // 不能删
+    Set<String>selectTagsTitleByArticleId(String artId);
 }

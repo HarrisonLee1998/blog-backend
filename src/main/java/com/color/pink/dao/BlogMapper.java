@@ -1,6 +1,7 @@
 package com.color.pink.dao;
 
 import com.color.pink.pojo.Article;
+import com.color.pink.pojo.Tag;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -20,4 +21,8 @@ public interface BlogMapper {
 
     // 添加文章标签关系
     boolean addBlogs(@Param("artId") String artId, @Param("tagIds") Set<String>tagIds);
+
+    Set<Tag>selectTagsByArticleId(String id);
+
+    boolean deleteBlogs(@Param("artId") String artId, @Param("tagIds") Set<String>tagIds);
 }

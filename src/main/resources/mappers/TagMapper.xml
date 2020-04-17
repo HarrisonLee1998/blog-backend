@@ -45,4 +45,8 @@
       (#{item.id}, #{item.title}, #{item.createDate}, #{item.viewTimes})
     </foreach>
   </insert>
+
+  <select id="selectTagsTitleByArticleId" resultType="java.lang.String" parameterType="java.lang.String">
+    SELECT t.title FROM tag AS t, blog AS b WHERE t.id = b.tag_id AND b.art_id = #{artId}
+  </select>
 </mapper>

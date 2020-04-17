@@ -1,0 +1,61 @@
+PUT article
+{
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "text",
+        "index": true
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "ik_max_word"
+      },
+      "markdown": {
+        "type": "text",
+        "index": false
+      },
+      "html": {
+        "type": "text",
+        "index": false
+      },
+      "pure_txt": {
+        "type": "text",
+        "analyzer": "ik_max_word"
+      },
+      "star": {
+        "type": "integer",
+        "index": false
+      },
+      "is_open": {
+        "type": "integer",
+        "index": true
+      },
+      "is_delete": {
+        "type": "integer",
+        "index": true
+      },
+      "is_reward": {
+        "type": "integer",
+        "index": true
+      },
+      "post_date": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss",
+        "index": true
+      },
+      "last_update_date": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss",
+        "index": true
+      },
+      "archive_title": {
+        "type": "text",
+        "analyzer": "ik_max_word"
+      },
+      "tags": {
+        "type": "text",
+        "analyzer": "ik_max_word"
+      }
+    }
+  }
+}

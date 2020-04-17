@@ -42,4 +42,17 @@
             (#{artId}, #{tagId})
         </foreach>
     </insert>
+
+    <select id="selectTagsByArticleId" parameterType="java.lang.String" resultType="com.color.pink.pojo.Tag">
+        SELECT t.id, t.title  FROM tag AS t, blog AS b
+            WHERE t.id = b.tag_id AND b.art_id = #{id}
+    </select>
+
+    <delete id="deleteBlogs">
+        DELETE FROM blog
+        WHERE art_id = #{artId} AND tag_id IN
+        <foreach collection="tagIds" item="tagId" separator="," open="(" close=")">
+            #{tagId}
+        </foreach>
+    </delete>
 </mapper>

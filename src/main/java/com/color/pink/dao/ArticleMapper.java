@@ -11,7 +11,7 @@ public interface ArticleMapper {
 
     List<Article> selectAll();
 
-    int updateByPrimaryKey(Article record);
+    boolean updateByPrimaryKey(Article record);
 
     boolean postArticle(Article article);
 

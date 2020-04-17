@@ -53,11 +53,13 @@ public class SetTest {
     void test2() {
         var set1 = new HashSet<String>();
         set1.add("java");
+        set1.add("Ubuntu");
+        set1.add("二叉树");
         var set2 = new HashSet<String>();
         set2.add("java");
         set2.add("spring");
         set2.add("mybatis");
-        set2.retainAll(set1);
-        set2.forEach(System.out::println);
+        set1.removeAll(set2);
+        set1.forEach(System.out::println);
     }
 }

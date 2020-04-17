@@ -5,7 +5,7 @@
     <id column="id" jdbcType="CHAR" property="id" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="star" jdbcType="INTEGER" property="star" />
-    <result column="view_time" jdbcType="INTEGER" property="viewTime" />
+    <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
     <result column="is_open" jdbcType="INTEGER" property="isOpen" />
     <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
     <result column="post_date" jdbcType="TIMESTAMP" property="postDate" />
@@ -14,6 +14,7 @@
     <result column="is_reward" jdbcType="INTEGER" property="isReward" />
     <result column="markdown" jdbcType="LONGVARCHAR" property="markdown" />
     <result column="html" jdbcType="LONGVARCHAR" property="html" />
+    <association property="tags" select="com.color.pink.dao.TagMapper.selectTagsTitleByArticleId" column="id"/>
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from article
@@ -21,12 +22,12 @@
   </delete>
   <insert id="insert" parameterType="com.color.pink.pojo.Article">
     insert into article (id, title, star, 
-      view_time, is_open, is_delete, 
+      view_times, is_open, is_delete, 
       post_date, last_update_date, archive_title, 
       is_reward, markdown, html
       )
     values (#{id,jdbcType=CHAR}, #{title,jdbcType=VARCHAR}, #{star,jdbcType=INTEGER}, 
-      #{viewTime,jdbcType=INTEGER}, #{isOpen,jdbcType=INTEGER}, #{isDelete,jdbcType=INTEGER}, 
+      #{viewTimes,jdbcType=INTEGER}, #{isOpen,jdbcType=INTEGER}, #{isDelete,jdbcType=INTEGER},
       #{postDate,jdbcType=TIMESTAMP}, #{lastUpdateDate,jdbcType=TIMESTAMP}, #{archiveTitle,jdbcType=VARCHAR}, 
       #{isReward,jdbcType=INTEGER}, #{markdown,jdbcType=LONGVARCHAR}, #{html,jdbcType=LONGVARCHAR}
       )
@@ -35,7 +36,7 @@
     update article
     set title = #{title,jdbcType=VARCHAR},
       star = #{star,jdbcType=INTEGER},
-      view_time = #{viewTime,jdbcType=INTEGER},
+      view_times = #{viewTimes,jdbcType=INTEGER},
       is_open = #{isOpen,jdbcType=INTEGER},
       is_delete = #{isDelete,jdbcType=INTEGER},
       post_date = #{postDate,jdbcType=TIMESTAMP},
@@ -47,13 +48,13 @@
     where id = #{id,jdbcType=CHAR}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select id, title, star, view_time, is_open, is_delete, post_date, last_update_date, 
+    select id, title, star, view_times, is_open, is_delete, post_date, last_update_date, 
     archive_title, is_reward, markdown, html
     from article
     where id = #{id,jdbcType=CHAR}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select id, title, star, view_time, is_open, is_delete, post_date, last_update_date, 
+    select id, title, star, view_times, is_open, is_delete, post_date, last_update_date,
     archive_title, is_reward, markdown, html
     from article
   </select>
