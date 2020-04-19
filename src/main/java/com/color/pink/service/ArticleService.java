@@ -3,6 +3,7 @@ package com.color.pink.service;
 import com.color.pink.dao.ArticleMapper;
 import com.color.pink.pojo.Article;
 import com.color.pink.pojo.Tag;
+import com.color.pink.util.PageHelper;
 import com.color.pink.util.UUIDHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,12 +33,22 @@ public class ArticleService {
 
     private Map<String, Tag>map;
 
+    public Map<String, Object>getArticleById(String id, boolean filterOpen, boolean isOpen,
+                                             boolean filterDelete, boolean isDelete) throws IOException {
+        return elasticSearchService.getDocById(id, filterOpen, isOpen, filterDelete, isDelete);
+    }
+
     public List<Article>selectAll() {
         var list = articleMapper.selectAll();
         Objects.requireNonNull(list);
         return list;
     }
 
+    public void selectAll(PageHelper pageHelper, boolean filterOpen, boolean isOpen,
+                          boolean filterDelete, boolean isDelete) throws Exception {
+        elasticSearchService.getDocs(pageHelper, filterOpen, isOpen, filterDelete, isDelete);
+        Objects.requireNonNull(pageHelper.getList());
+    }
 
     public boolean postArticle(Article article) throws Exception {
         Integer ID_LEN = 12;

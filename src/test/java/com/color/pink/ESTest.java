@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author HarrisonLee
@@ -69,24 +69,26 @@ public class ESTest {
 
     @Test
     void testSearchDoc01() throws IOException {
-        String id = "rjX4QbQ1k1gY";
-        var list = elasticSearchService.getOpenDocById(id, true);
-        System.out.println(list.size());
-        for (Map<String, Object> map : list) {
+        String id = "g2C31qhA9769";
+        var map = elasticSearchService.getDocById(id, true, true, true, true);
+        if(Objects.nonNull(map)) {
             map.forEach((key, value) -> {
                 System.out.println(key+" : "+value);
             });
-            System.out.println("==========================");
         }
+        else {
+            System.out.println("结果为空");
+        }
+        System.out.println("==========================");
     }
 
     @Test
     void testGetDocs() throws Exception {
         var pageHelper = new PageHelper();
-        for(var i = 1; i<5; ++i){
+        for(var i = 1; i < 5; ++i){
             pageHelper.setPageNo(i);
             pageHelper.setPageSize(4);
-            elasticSearchService.getDocs(true, true, pageHelper);
+            elasticSearchService.getDocs(pageHelper,false, true, true, false);
             System.out.println(pageHelper);
         }
 

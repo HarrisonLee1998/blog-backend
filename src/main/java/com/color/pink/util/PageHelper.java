@@ -24,6 +24,7 @@ public class PageHelper implements Serializable {
     private int pageNo;
 
     // 每页数量
+    @Min(1)
     private int pageSize;
 
     // 总的元素个数
@@ -46,4 +47,13 @@ public class PageHelper implements Serializable {
 
     // 数据
     private List<Object>list;
+
+    public void check() throws Exception {
+        if (this.pageNo < 1) {
+            throw new Exception("页码不合法");
+        }
+        if(this.pageSize < 0) {
+            throw new Exception("每页数量不合法");
+        }
+    }
 }

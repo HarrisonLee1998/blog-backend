@@ -30,6 +30,10 @@ public class ResponseUtil implements Serializable {
         this.map = new HashMap<>();
     }
 
+    public ResponseUtil(){
+        this.status = HttpStatus.OK;
+        this.map = new HashMap<>();
+    }
 
     public ResponseUtil put(String key, Object value) {
         this.map.put(key, value);
@@ -43,5 +47,8 @@ public class ResponseUtil implements Serializable {
 
     public static ResponseUtil factory(HttpStatus status){
         return new ResponseUtil(status);
+    }
+    public static ResponseUtil factory(){
+        return new ResponseUtil();
     }
 }

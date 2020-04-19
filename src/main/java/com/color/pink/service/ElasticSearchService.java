@@ -110,57 +110,92 @@ public class ElasticSearchService {
     }
 
     /**
-     * 根据ID来查询文档，测试通过
-     * 请注意，当文章被加入回收站后是不能被查到的，另外是否公开根据传入的isOpen来决定
+     * 根据ID来查询文档，有响应的条件限制，测试通过
      * @param id
      * @param isOpen
      * @return
      * @throws IOException
      */
-    public List<Map<String, Object>> getOpenDocById(String  id, Boolean isOpen) throws IOException {
+    public Map<String, Object> getDocById(String  id, Boolean filterOpen, boolean isOpen,
+                                                boolean filterDelete, boolean isDelete) throws IOException {
         var request = new SearchRequest(INDEX_ARTICLE);
-        String[] includes = {"id", "title", "archive_title", "tags"};
-        String[] excludes = Strings.EMPTY_ARRAY;//{"is_delete", "is_open", "pure_txt"};
+        String[] includes = Strings.EMPTY_ARRAY;
+        var list = new ArrayList<String>();
+        list.add("pure_txt");
+        // 必须把不是公开的过滤掉，说明是客户端的请求，则将不需要的字段过滤掉
+        if(filterOpen&&isOpen) {
+            list.add("is_open");
+            list.add("is_delete");
+            list.add("markdown");
+        }
+        String[] excludes = new String[list.size()];
+        list.toArray(excludes);
         var fetchSourceContext = new FetchSourceContext(true, includes, excludes);
         var searchSourceBuilder = new SearchSourceBuilder();
+        var queryBuilder = QueryBuilders.boolQuery();
+        if(filterOpen) {
+            var isOpenQuery = QueryBuilders.termQuery("is_open", isOpen ? 1 : 0);
+            queryBuilder.must(isOpenQuery);
+        }
+        if(filterDelete) {
+            var isDeleteQuery = QueryBuilders.termQuery("is_delete", isDelete ? 1 : 0);
+            queryBuilder.must(isDeleteQuery);
+        }
+
+        // 必须满足ID相等
         var idQuery = QueryBuilders.termQuery("id", id);
-        var isOpenQuery = QueryBuilders.termQuery("is_open", isOpen?1:0);
-        var isDeleteQuery = QueryBuilders.termQuery("is_delete", 0);
-        searchSourceBuilder.query(idQuery);
-        // 过滤掉是否公开和没有被删除的
-        searchSourceBuilder.postFilter(isOpenQuery);
-        searchSourceBuilder.postFilter(isDeleteQuery);
+        queryBuilder.must(idQuery);
+        // 必须满足
+        searchSourceBuilder.query(queryBuilder);
+
         //指定查询哪些字段
         searchSourceBuilder.fetchSource(fetchSourceContext);
         request.source(searchSourceBuilder);
 
+        searchSourceBuilder.size(1);
+
         var response = client.search(request, RequestOptions.DEFAULT);
-        var list = new ArrayList<Map<String, Object>>();
-        var map = new HashMap<String, Object>();
-        response.getHits().forEach(hit -> {
-            list.add(hit.getSourceAsMap());
-        });
-        return list;
+        if(response.getHits().getTotalHits().value > 0) {
+            return response.getHits().getAt(0).getSourceAsMap();
+        } else {
+            return null;
+        }
     }
 
-    public PageHelper getDocs(Boolean isOpen, Boolean isDelete, PageHelper pageHelper) throws Exception {
-        if(pageHelper.getPageNo() < 1) {
-            throw new Exception("无效页码范围");
-        }
+    public PageHelper getDocs(PageHelper pageHelper,boolean filterOpen, boolean isOpen, boolean filterDelete, boolean isDelete) throws Exception {
+        Objects.requireNonNull(pageHelper);
+        pageHelper.check();
         var request = new SearchRequest(INDEX_ARTICLE);
         var searchSourceBuilder = new SearchSourceBuilder();
         var matchAllQueryBuilder = QueryBuilders.matchAllQuery();
-        var isOpenQuery = QueryBuilders.termQuery("is_open", isOpen ? 1 : 0);
-        var isDeleteQuery = QueryBuilders.termQuery("is_delete", isDelete ? 1 : 0);
         searchSourceBuilder.query(matchAllQueryBuilder);
-        searchSourceBuilder.postFilter(isOpenQuery).postFilter(isDeleteQuery);
-
+        var queryBuilder = QueryBuilders.boolQuery();
+        // 是否过滤是否公开的
+        if(filterOpen) {
+            var isOpenQuery = QueryBuilders.termQuery("is_open", isOpen ? 1 : 0);
+            queryBuilder.must(isOpenQuery);
+        }
+        // 是否过滤是否删除的
+        if(filterDelete) {
+            var isDeleteQuery = QueryBuilders.termQuery("is_delete", isDelete ? 1 : 0);
+           queryBuilder.must(isDeleteQuery);
+        }
+        searchSourceBuilder.query(queryBuilder);
         /**
          * 指定查询字段
          * 这里的规则是: 集合includes-excludes，也就是在集合includes中，而不在excludes中的字段
          */
-        String[] includes = {"id", "title", "archive_title", "last_update_date"};//Strings.EMPTY_ARRAY; //{"id", "title", "archive_title", "tags"};
-        String[] excludes = {"tags", "is_delete", "is_open", "pure_txt"};
+        String[] includes = Strings.EMPTY_ARRAY;
+        var list = new ArrayList<String>();
+        list.add("pure_txt");
+        // 必须把不是公开的过滤掉，说明是客户端的请求，则将不需要的字段过滤掉
+        if(filterOpen&&isOpen) {
+            list.add("is_open");
+            list.add("is_delete");
+            list.add("markdown");
+        }
+        String[] excludes = new String[list.size()];
+        list.toArray(excludes);
         var fetchSourceContext = new FetchSourceContext(true, includes, excludes);
         searchSourceBuilder.fetchSource(fetchSourceContext);
 
