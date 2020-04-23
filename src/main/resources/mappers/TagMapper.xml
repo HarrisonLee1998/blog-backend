@@ -6,7 +6,17 @@
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
     <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
+    <association property="articleNums" select="com.color.pink.dao.BlogMapper.countArticleByTag" column="id"/>
   </resultMap>
+
+  <resultMap id="BaseResultMap2" type="com.color.pink.pojo.Tag">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
+    <association property="articleNums" select="com.color.pink.dao.BlogMapper.countArticleByTag2" column="id"/>
+  </resultMap>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tag
     where id = #{id,jdbcType=CHAR}
@@ -30,6 +40,11 @@
     where id = #{id,jdbcType=CHAR}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
+    select id, title, create_date, view_times
+    from tag
+  </select>
+
+  <select id="selectAll2" resultMap="BaseResultMap">
     select id, title, create_date, view_times
     from tag
   </select>

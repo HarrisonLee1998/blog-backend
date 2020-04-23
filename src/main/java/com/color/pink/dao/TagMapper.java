@@ -13,12 +13,14 @@ public interface TagMapper {
     Tag selectByPrimaryKey(String id);
 
     Set<Tag> selectAll();
+    Set<Tag> selectAll2();
 
     int updateByPrimaryKey(Tag record);
 
     Set<String> selectAllTagTitle();
 
     boolean addTags(@Param("tags") Set<Tag>tags);
+
     // 不能删
     Set<String>selectTagsTitleByArticleId(String artId);
 }

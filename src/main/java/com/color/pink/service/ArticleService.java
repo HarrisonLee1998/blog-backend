@@ -3,7 +3,7 @@ package com.color.pink.service;
 import com.color.pink.dao.ArticleMapper;
 import com.color.pink.pojo.Article;
 import com.color.pink.pojo.Tag;
-import com.color.pink.util.PageHelper;
+import com.color.pink.util.PageUtil;
 import com.color.pink.util.UUIDHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,10 +44,10 @@ public class ArticleService {
         return list;
     }
 
-    public void selectAll(PageHelper pageHelper, boolean filterOpen, boolean isOpen,
+    public void selectAll(PageUtil pageUtil, boolean filterOpen, boolean isOpen,
                           boolean filterDelete, boolean isDelete) throws Exception {
-        elasticSearchService.getDocs(pageHelper, filterOpen, isOpen, filterDelete, isDelete);
-        Objects.requireNonNull(pageHelper.getList());
+        elasticSearchService.getDocs(pageUtil, filterOpen, isOpen, filterDelete, isDelete);
+        Objects.requireNonNull(pageUtil.getList());
     }
 
     public boolean postArticle(Article article) throws Exception {

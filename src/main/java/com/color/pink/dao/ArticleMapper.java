@@ -3,6 +3,7 @@ package com.color.pink.dao;
 import com.color.pink.pojo.Article;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ArticleMapper {
     int deleteByPrimaryKey(String id);
@@ -16,6 +17,6 @@ public interface ArticleMapper {
     boolean postArticle(Article article);
 
     // 下面两个提供给查询归档时，查询归档文章数量时用的
-    int countArticleByArchive(String archive);
-    int countArticleByArchive2(String archive);
+    Set<Article> selectArticleByArchive(String archive);
+    Set<Article> selectArticleByArchive2(String archive);
 }

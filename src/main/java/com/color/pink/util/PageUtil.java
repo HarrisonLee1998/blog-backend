@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class PageHelper implements Serializable {
+public class PageUtil implements Serializable {
 
     // 当前页码
     @Min(1)

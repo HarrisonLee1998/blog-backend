@@ -1,5 +1,6 @@
 package com.color.pink.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
@@ -15,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@JsonIgnoreProperties(value = { "handler" })
 public class Article implements Serializable {
     private String id;
 

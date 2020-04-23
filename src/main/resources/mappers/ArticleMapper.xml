@@ -65,11 +65,11 @@
     #{postDate}, #{lastUpdateDate}, #{archiveTitle}, #{isReward})
   </insert>
 
-  <select id="countArticleByArchive" parameterType="java.lang.String" resultType="java.lang.Integer">
-    SELECT COUNT(*) FROM article WHERE archive_title = #{archive} AND is_delete = 0
+  <select id="selectArticleByArchive" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
+    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_delete = 0
   </select>
 
-  <select id="countArticleByArchive2" parameterType="java.lang.String" resultType="java.lang.Integer">
-    SELECT COUNT(*) FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0
+  <select id="selectArticleByArchive2" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
+    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0
   </select>
 </mapper>

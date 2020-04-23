@@ -3,7 +3,7 @@ package com.color.pink;
 import com.color.pink.pojo.Article;
 import com.color.pink.service.ArticleService;
 import com.color.pink.service.ElasticSearchService;
-import com.color.pink.util.PageHelper;
+import com.color.pink.util.PageUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -71,12 +71,11 @@ public class ESTest {
     void testSearchDoc01() throws IOException {
         String id = "g2C31qhA9769";
         var map = elasticSearchService.getDocById(id, true, true, true, true);
-        if(Objects.nonNull(map)) {
+        if (Objects.nonNull(map)) {
             map.forEach((key, value) -> {
-                System.out.println(key+" : "+value);
+                System.out.println(key + " : " + value);
             });
-        }
-        else {
+        } else {
             System.out.println("结果为空");
         }
         System.out.println("==========================");
@@ -84,7 +83,7 @@ public class ESTest {
 
     @Test
     void testGetDocs() throws Exception {
-        var pageHelper = new PageHelper();
+        var pageHelper = new PageUtil();
         for(var i = 1; i < 5; ++i){
             pageHelper.setPageNo(i);
             pageHelper.setPageSize(4);

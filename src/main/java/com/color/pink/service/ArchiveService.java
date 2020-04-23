@@ -5,9 +5,9 @@ import com.color.pink.pojo.Archive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author HarrisonLee
@@ -20,14 +20,13 @@ public class ArchiveService {
     private ArchiveMapper archiveMapper;
 
     public boolean addArchive(Archive archive){
-        archive.setCreateDate(LocalDateTime.now());
-        archive.setViewTimes(0);
         return archiveMapper.addArchive(archive);
     }
 
     public List<Archive> selectAll(boolean admin){
         var list = admin? archiveMapper.selectAll(): archiveMapper.selectAll2();
-        list.sort(Comparator.comparingInt(Archive::getOrder));
+        list.sort(Comparator.comparingInt(x -> x.getOrder()));
+        Objects.requireNonNull(list);
         return list;
     }
 }

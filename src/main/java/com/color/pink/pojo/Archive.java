@@ -6,7 +6,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -22,15 +22,7 @@ public class Archive implements Serializable {
     @Length(max = 32)
     private String title;
 
-    private LocalDateTime createDate;
+    private String imgUrl;
 
-    private Integer viewTimes;
-
-    @Length(max = 1 << 16)
-    private String markdown;
-
-    @Length(max = 1 << 16)
-    private String html;
-
-    private Integer articleNums;
+    private Set<Article> articles;
 }

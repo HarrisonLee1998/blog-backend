@@ -2,7 +2,7 @@ package com.color.pink.service;
 
 import com.color.pink.pojo.Article;
 import com.color.pink.pojo.ESArticle;
-import com.color.pink.util.PageHelper;
+import com.color.pink.util.PageUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.DocWriteResponse;
@@ -162,9 +162,9 @@ public class ElasticSearchService {
         }
     }
 
-    public PageHelper getDocs(PageHelper pageHelper,boolean filterOpen, boolean isOpen, boolean filterDelete, boolean isDelete) throws Exception {
-        Objects.requireNonNull(pageHelper);
-        pageHelper.check();
+    public PageUtil getDocs(PageUtil pageUtil, boolean filterOpen, boolean isOpen, boolean filterDelete, boolean isDelete) throws Exception {
+        Objects.requireNonNull(pageUtil);
+        pageUtil.check();
         var request = new SearchRequest(INDEX_ARTICLE);
         var searchSourceBuilder = new SearchSourceBuilder();
         var matchAllQueryBuilder = QueryBuilders.matchAllQuery();
@@ -208,46 +208,53 @@ public class ElasticSearchService {
         /**
          * 设置分页查询
          */
-        searchSourceBuilder.from((pageHelper.getPageNo() - 1)*pageHelper.getPageSize());
-        searchSourceBuilder.size(pageHelper.getPageSize());
+        searchSourceBuilder.from((pageUtil.getPageNo() - 1)* pageUtil.getPageSize());
+        searchSourceBuilder.size(pageUtil.getPageSize());
 
         request.source(searchSourceBuilder);
         var response = client.search(request, RequestOptions.DEFAULT);
-        return handleSearchResponse(response, pageHelper);
+        return handleSearchResponse(response, pageUtil);
     }
 
-    public PageHelper handleSearchResponse(SearchResponse response, PageHelper pageHelper){
-        pageHelper.setTotal((int) response.getHits().getTotalHits().value);
+    public PageUtil handleSearchResponse(SearchResponse response, PageUtil pageUtil){
+        pageUtil.setTotal((int) response.getHits().getTotalHits().value);
 
         var list = new ArrayList<Map<String, Object>>();
-        response.getHits().forEach(hit -> {
-            list.add(hit.getSourceAsMap());
-        });
-        pageHelper.setList(Collections.singletonList(list));
+//        response.getHits().forEach(hit -> {
+//            list.add(hit.getSourceAsMap());
+//        });
+//        pageHelper.setList(Collections.singletonList(list));
 
-        int p = pageHelper.getTotal() / pageHelper.getPageSize();
-        if(pageHelper.getTotal() % pageHelper.getPageSize() != 0) {
+        var length = response.getHits().getHits().length;
+        for(int i = 0; i < length; ++i){
+            list.add(response.getHits().getHits()[i].getSourceAsMap());
+        }
+
+        pageUtil.setList(Collections.singletonList(list));
+
+        int p = pageUtil.getTotal() / pageUtil.getPageSize();
+        if(pageUtil.getTotal() % pageUtil.getPageSize() != 0) {
             p += 1;
         }
-        pageHelper.setPages(p);
+        pageUtil.setPages(p);
 
         /**
          * 如果有数据，直接根据pageNo == 1即可判断是否是第一页
          * 如果没有数据，则需要再判断当前页码小于等于总页数
          */
-        if(pageHelper.getPageNo() == 1 && pageHelper.getPageNo() <= pageHelper.getPages()) {
-            pageHelper.setFirst(true);
+        if(pageUtil.getPageNo() == 1 && pageUtil.getPageNo() <= pageUtil.getPages()) {
+            pageUtil.setFirst(true);
         } else {
-            pageHelper.setFirst(false);
+            pageUtil.setFirst(false);
         }
 
         /**
          * 直接判断当前页码是否等于总页数即可，因为如果数据为空的话，那么pages就为0了
          */
-        if(pageHelper.getPageNo() == pageHelper.getPages()) {
-            pageHelper.setLast(true);
+        if(pageUtil.getPageNo() == pageUtil.getPages()) {
+            pageUtil.setLast(true);
         } else {
-            pageHelper.setLast(false);
+            pageUtil.setLast(false);
         }
 
 
@@ -258,17 +265,17 @@ public class ElasticSearchService {
          * (pageHelper.getPageSize() * (pageHelper.getPageNo() - 2) + 1)
          *  正是前一页第一个元素的下标（从1开始）
          */
-        if(pageHelper.getPageNo() > 1 &&
-                (pageHelper.getPageSize() * (pageHelper.getPageNo() - 2) + 1) <= pageHelper.getTotal()) {
-            pageHelper.setHasPrevious(true);
+        if(pageUtil.getPageNo() > 1 &&
+                (pageUtil.getPageSize() * (pageUtil.getPageNo() - 2) + 1) <= pageUtil.getTotal()) {
+            pageUtil.setHasPrevious(true);
         } else {
-            pageHelper.setHasPrevious(false);
+            pageUtil.setHasPrevious(false);
         }
 
-        if(((pageHelper.getPageNo()) * pageHelper.getPageSize() + 1) <= pageHelper.getTotal()) {
-            pageHelper.setHashNext(true);
+        if(((pageUtil.getPageNo()) * pageUtil.getPageSize() + 1) <= pageUtil.getTotal()) {
+            pageUtil.setHashNext(true);
         } else {
-            pageHelper.setHashNext(false);
+            pageUtil.setHashNext(false);
         }
 //
 //        if(!pageHelper.isHasPrevious() &&
@@ -284,7 +291,7 @@ public class ElasticSearchService {
 //        } else {
 //            pageHelper.setLast(false);
 //        }
-        return pageHelper;
+        return pageUtil;
     }
 
 

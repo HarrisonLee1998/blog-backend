@@ -3,7 +3,7 @@ package com.color.pink.controller;
 import com.color.pink.annotation.ApiOperation;
 import com.color.pink.pojo.Article;
 import com.color.pink.service.ArticleService;
-import com.color.pink.util.PageHelper;
+import com.color.pink.util.PageUtil;
 import com.color.pink.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,16 +39,16 @@ public class ArticleController {
 
     @ApiOperation("获取文章")
     @GetMapping(value = {"admin/article", "article", "admin/article/recycle"})
-    public ResponseUtil selectAll(HttpServletRequest request, @Valid PageHelper pageHelper) throws Exception {
+    public ResponseUtil selectAll(HttpServletRequest request, @Valid PageUtil pageUtil) throws Exception {
         var response = ResponseUtil.factory(HttpStatus.OK);
         if(request.getRequestURI().equals("/article")) {
-            articleService.selectAll(pageHelper, true, true, true, false);
+            articleService.selectAll(pageUtil, true, true, true, false);
         }else if(request.getRequestURI().equals("/admin/article")) {
-            articleService.selectAll(pageHelper, false, false, true, false);
+            articleService.selectAll(pageUtil, false, false, true, false);
         }else{
-            articleService.selectAll(pageHelper, false, false, true, true);
+            articleService.selectAll(pageUtil, false, false, true, true);
         }
-        response.put("pageHelper", pageHelper);
+        response.put("pageHelper", pageUtil);
         return response;
     }
 
