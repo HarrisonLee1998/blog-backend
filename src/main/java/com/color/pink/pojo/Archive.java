@@ -1,6 +1,7 @@
 package com.color.pink.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
@@ -15,6 +16,7 @@ import java.util.Set;
 @ToString
 @EqualsAndHashCode
 @JsonIgnoreProperties(value = { "handler" })
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Archive implements Serializable {
     private Integer order;
 

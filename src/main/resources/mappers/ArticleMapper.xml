@@ -59,6 +59,13 @@
     from article
   </select>
 
+  <select id="selectByTag" resultType="com.color.pink.pojo.Article">
+    SELECT a.id, a.title, a.last_update_date FROM article AS a, blog AS b
+    WHERE b.tag_id = #{tagId} AND a.id = b.art_id AND a.is_delete = 0
+    <if test="!isAdmin">AND a.is_open = 1</if>
+    ORDER BY last_update_date DESC
+  </select>
+
   <insert id="postArticle" parameterType="com.color.pink.pojo.Article">
     INSERT INTO article VALUES
     (#{id}, #{title}, #{markdown}, #{html}, #{star}, #{viewTimes}, #{isOpen}, #{isDelete},
@@ -66,10 +73,19 @@
   </insert>
 
   <select id="selectArticleByArchive" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
-    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_delete = 0
+    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_delete = 0 ORDER BY last_update_date DESC limit 6
   </select>
 
   <select id="selectArticleByArchive2" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
-    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0
+    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0 ORDER BY last_update_date DESC limit 6
+  </select>
+
+  <select id="selectArticleByArchiveTitle" resultType="com.color.pink.pojo.Article">
+    SELECT id, title, last_update_date FROM article
+    WHERE archive_title = #{archiveTitle} AND is_delete = 0
+    <if test="!isAdmin">
+      AND is_open = 1;
+    </if>
+    ORDER BY last_update_date DESC
   </select>
 </mapper>

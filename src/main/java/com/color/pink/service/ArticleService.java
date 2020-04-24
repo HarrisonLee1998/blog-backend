@@ -5,6 +5,8 @@ import com.color.pink.pojo.Article;
 import com.color.pink.pojo.Tag;
 import com.color.pink.util.PageUtil;
 import com.color.pink.util.UUIDHelper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,25 @@ public class ArticleService {
     private ElasticSearchService elasticSearchService;
 
     private Map<String, Tag>map;
+
+    public PageInfo<Article> getArticlesByArchiveTitle(boolean isAdmin, String archiveTitle, Integer pageNo, Integer pageSize) {
+        PageHelper.startPage(pageNo, pageSize);
+        var list = articleMapper.selectArticleByArchiveTitle(isAdmin, archiveTitle);
+        return new PageInfo<>(list);
+    }
+
+    public PageInfo<Article> getArticlesByTagTitle(Boolean isAdmin, String tagTitle, Integer pageNo, Integer pageSize) {
+        if(Objects.isNull(map)){
+            fillMap();
+        }
+        var tag = map.get(tagTitle);
+        if(Objects.isNull(tag)) {
+            return new PageInfo<>();
+        }
+        PageHelper.startPage(pageNo, pageSize);
+        var list = articleMapper.selectByTag(isAdmin, tag.getId());
+        return new PageInfo<>(list);
+    }
 
     public Map<String, Object>getArticleById(String id, boolean filterOpen, boolean isOpen,
                                              boolean filterDelete, boolean isDelete) throws IOException {

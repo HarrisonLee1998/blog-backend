@@ -43,3 +43,8 @@ qiniu:
   AccessKey: s2isdTfRNsqvGvE3ysU58S0UWCMRflkYhapdJTC2
   SecretKey: yeJfZJCiqai7L9yyU6KFfRdDNF4WUGOgtN-pRXzY
   Bucket: harrison-blog
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
