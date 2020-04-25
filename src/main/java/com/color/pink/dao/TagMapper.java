@@ -3,6 +3,7 @@ package com.color.pink.dao;
 import com.color.pink.pojo.Tag;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Set;
 
 public interface TagMapper {
@@ -12,8 +13,9 @@ public interface TagMapper {
 
     Tag selectByPrimaryKey(String id);
 
-    Set<Tag> selectAll();
-    Set<Tag> selectAll2();
+    boolean updateTitle(Tag tag);
+
+    List<Tag> selectAll(Boolean isAdmin);
 
     int updateByPrimaryKey(Tag record);
 

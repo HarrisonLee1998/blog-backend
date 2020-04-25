@@ -19,7 +19,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -46,6 +45,7 @@ public class WebLogAspect {
     public void doAfterReturning(Object ret) throws Throwable {
     }
 
+
     @Around("webLog()")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         var startTime = LocalDateTime.now();
@@ -63,12 +63,12 @@ public class WebLogAspect {
             webLog.setDescription(apiOperation.value());
         }
         var endTime = LocalDateTime.now();
-        webLog.setIp(request.getRemoteUser());
+        //webLog.setIp(request.getRemoteUser());
         webLog.setMethod(request.getMethod());
         webLog.setParameter(getParameter(method, joinPoint.getArgs()));
         webLog.setResult(result);
-        webLog.setSpendTime((int) (ChronoUnit.MILLIS.between(startTime, endTime)));
-        webLog.setStartTime(startTime);
+        //webLog.setSpendTime((int) (ChronoUnit.MILLIS.between(startTime, endTime)));
+        //webLog.setStartTime(startTime);
         webLog.setUri(request.getRequestURI());
         var mapper = new ObjectMapper();
         LOGGER.info("{}", mapper.writeValueAsString(webLog));

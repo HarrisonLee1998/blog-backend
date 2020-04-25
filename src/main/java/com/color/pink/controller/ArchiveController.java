@@ -6,10 +6,7 @@ import com.color.pink.service.ArchiveService;
 import com.color.pink.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -38,5 +35,18 @@ public class ArchiveController {
         var list = archiveService.selectAll(request.getRequestURI().startsWith("/admin"));
         Objects.requireNonNull(list);
         return ResponseUtil.factory(HttpStatus.OK).put("archives", list);
+    }
+
+    @ApiOperation("根据名称查询归档")
+    @GetMapping(value = {"admin/archive/{archiveTitle}", "archive/{archiveTitle}"})
+    public ResponseUtil getArchiveByTitle(HttpServletRequest request, @PathVariable String archiveTitle){
+        var response = ResponseUtil.factory();
+        var archive = archiveService.getArchiveByTitle(request.getRequestURI().startsWith("/admin"), archiveTitle);
+        if(Objects.isNull(archive)) {
+            response.setStatus(HttpStatus.NOT_FOUND);
+        } else {
+            response.put("archive", archive);
+        }
+        return response;
     }
 }

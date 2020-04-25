@@ -29,4 +29,11 @@
     INSERT INTO archive VALUES
     (#{title}, #{imgUrl}, #{order})
   </insert>
+
+  <select id="getArchiveByTitle" parameterType="java.lang.String" resultType="com.color.pink.pojo.Archive">
+    SELECT * FROM archive WHERE title = #{archiveTitle}
+    <if test="!isAdmin">
+      AND (SELECT COUNT(*) FROM article WHERE archive_title = #{archiveTitle}) > 0
+    </if>
+  </select>
 </mapper>

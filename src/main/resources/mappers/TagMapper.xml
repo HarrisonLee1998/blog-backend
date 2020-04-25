@@ -6,7 +6,7 @@
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
     <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
-    <association property="articleNums" select="com.color.pink.dao.BlogMapper.countArticleByTag" column="id"/>
+    <result property="articleNums" jdbcType="INTEGER" column="article_nums"/>
   </resultMap>
 
   <resultMap id="BaseResultMap2" type="com.color.pink.pojo.Tag">
@@ -14,7 +14,7 @@
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
     <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
-    <association property="articleNums" select="com.color.pink.dao.BlogMapper.countArticleByTag2" column="id"/>
+    <result property="articleNums" jdbcType="INTEGER" column="articleNums"/>
   </resultMap>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
@@ -34,19 +34,42 @@
       view_times = #{viewTimes,jdbcType=INTEGER}
     where id = #{id,jdbcType=CHAR}
   </update>
+
+  <update id="updateTitle" parameterType="com.color.pink.pojo.Tag">
+    update tag
+    set title = #{title,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=CHAR}
+  </update>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select id, title, create_date, view_times
     from tag
     where id = #{id,jdbcType=CHAR}
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
-    select id, title, create_date, view_times
-    from tag
-  </select>
-
-  <select id="selectAll2" resultMap="BaseResultMap">
-    select id, title, create_date, view_times
-    from tag
+    select t.id, t.title, t.create_date, t.view_times, COUNT(*) as article_nums
+    FROM tag as t, blog as b, article as a
+    WHERE t.id = b.tag_id AND a.id = b.art_id AND a.is_delete = 0
+    <if test="!isAdmin">
+      AND a.is_open = 1
+    </if>
+    GROUP BY t.id
+<!--    这里选择由pageHelper实现 ORDER BY-->
+<!--    <if test="sortBy == 0">-->
+<!--      create_date-->
+<!--    </if>-->
+<!--    <if test="sortBy == 1">-->
+<!--      view_times-->
+<!--    </if>-->
+<!--    <if test="sortBy == 2">-->
+<!--      article_nums-->
+<!--    </if>-->
+<!--    <if test="sortDesc == 1">-->
+<!--      DESC-->
+<!--    </if>-->
+<!--    <if test="sortDesc == 0">-->
+<!--      ASC-->
+<!--    </if>-->
   </select>
 
   <select id="selectAllTagTitle" resultType="java.lang.String">

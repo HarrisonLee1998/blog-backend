@@ -29,4 +29,8 @@ public class ArchiveService {
         Objects.requireNonNull(list);
         return list;
     }
+
+    public Archive getArchiveByTitle(Boolean isAdmin, String archiveTitle) {
+        return archiveMapper.getArchiveByTitle(isAdmin, archiveTitle);
+    }
 }
