@@ -17,14 +17,13 @@ import java.util.List;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class PageUtil implements Serializable {
+public class PageUtil <T> implements Serializable {
 
     // 当前页码
     @Min(1)
     private int pageNo;
 
     // 每页数量
-    @Min(1)
     private int pageSize;
 
     // 总的元素个数
@@ -46,7 +45,7 @@ public class PageUtil implements Serializable {
     private boolean hashNext;
 
     // 数据
-    private List<Object>list;
+    private List<T>list;
 
     public void check() throws Exception {
         if (this.pageNo < 1) {

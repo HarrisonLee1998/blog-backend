@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -38,20 +39,54 @@ public class ArticleController {
         return response;
     }
 
-    @ApiOperation("获取文章")
-    @GetMapping(value = {"admin/article", "article", "admin/article/recycle"})
-    public ResponseUtil selectAll(HttpServletRequest request, @Valid PageUtil pageUtil) throws Exception {
+    @ApiOperation("分页查询文章（请求ES）")
+    @GetMapping(value = {"admin/article/{pageNo:^[1-9]\\d*$}/{pageSize:^-?[0-9]+$}",
+            "article/{pageNo:^[1-9]\\d*$}/{pageSize:^-?[0-9]+$}",
+            "admin/article/recycle/{pageNo:^[1-9]\\d*$}/{pageSize:^-?[0-9]+$}"})
+    public ResponseUtil selectAll(HttpServletRequest request,
+                                  @PathVariable Integer pageNo,
+                                  @PathVariable Integer pageSize) throws Exception {
+        if(pageSize < 0) {
+            pageSize = Integer.MAX_VALUE - 1;
+        }
+        var pageUtil = new PageUtil<Map<String, Object>>();
+        pageUtil.setPageNo(pageNo);
+        pageUtil.setPageSize(pageSize);
         var response = ResponseUtil.factory(HttpStatus.OK);
-        if(request.getRequestURI().equals("/article")) {
+        if(request.getRequestURI().startsWith("/article")) {
             articleService.selectAll(pageUtil, true, true, true, false);
-        }else if(request.getRequestURI().equals("/admin/article")) {
+        }else if(request.getRequestURI().startsWith("/admin/article")) {
             articleService.selectAll(pageUtil, false, false, true, false);
         }else{
             articleService.selectAll(pageUtil, false, false, true, true);
         }
-        response.put("pageHelper", pageUtil);
+        response.put("pageUtil", pageUtil);
         return response;
     }
+
+
+    @ApiOperation("根据关键词搜索文章（请求ES）")
+    @GetMapping(value = {"admin/article/search",
+            "article/search",
+            "admin/article/recycle/search}"})
+    public ResponseUtil searchDocs(HttpServletRequest request,
+                                   @Valid PageUtil<Map<String, Object>>pageUtil,
+                                   @NotBlank String keyword) throws Exception {
+        if(pageUtil.getPageSize() < 0) {
+            pageUtil.setPageSize(Integer.MAX_VALUE - 1);
+        }
+        var response = ResponseUtil.factory(HttpStatus.OK);
+        if(request.getRequestURI().startsWith("/article")) {
+            articleService.searchDocs(pageUtil, keyword, true, true, true, false);
+        }else if(request.getRequestURI().startsWith("/admin/article")) {
+            articleService.searchDocs(pageUtil, keyword, false, false, true, false);
+        }else{
+            articleService.searchDocs(pageUtil, keyword,false, false, true, true);
+        }
+        response.put("pageUtil", pageUtil);
+        return response;
+    }
+
 
     @ApiOperation("根据ID查询文章")
     @GetMapping(value = {"admin/article/entry/{id}", "article/entry/{id}"})

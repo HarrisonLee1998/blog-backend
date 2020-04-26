@@ -21,6 +21,13 @@
     delete from tag
     where id = #{id,jdbcType=CHAR}
   </delete>
+  <delete id="deleteInValidTag">
+    DELETE FROM tag
+    WHERE id NOT IN
+    (
+    SELECT DISTINCT tag_id FROM blog
+    )
+  </delete>
   <insert id="insert" parameterType="com.color.pink.pojo.Tag">
     insert into tag (id, title, create_date, 
       view_times)

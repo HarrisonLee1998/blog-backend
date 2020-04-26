@@ -64,8 +64,7 @@ public class ESArticle {
     private String pure_txt;
 
     public ESArticle(Article article) throws IOException {
-        var htmlUtils = new HTMLUtils();
-        this.pure_txt = htmlUtils.handleParse(article.getHtml());
+        this.pure_txt = HTMLUtils.handleParse(article.getHtml());
         var f = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.post_date = f.format(article.getPostDate());
         this.last_update_date = f.format(article.getLastUpdateDate());

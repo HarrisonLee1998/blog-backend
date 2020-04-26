@@ -72,4 +72,14 @@ public class TagController {
         }
         return response;
     }
+
+    @ApiOperation("删除无效标签")
+    @DeleteMapping("admin/tag")
+    public ResponseUtil deleteInValidTag(){
+        var rows = tagService.deleteInValidTag();
+        var response = ResponseUtil.factory();
+        response.put("rows", rows);
+        return response;
+    }
+
 }

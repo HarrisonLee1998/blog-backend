@@ -29,7 +29,7 @@ public class HTMLUtils extends HTMLEditorKit.ParserCallback {
         return s.toString();
     }
 
-    public String handleParse(String html){
+    public static  String handleParse(String html){
         HTMLUtils htmlUtils=new HTMLUtils();
         try {
             htmlUtils.parse(html);

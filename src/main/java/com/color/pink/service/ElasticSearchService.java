@@ -2,6 +2,7 @@ package com.color.pink.service;
 
 import com.color.pink.pojo.Article;
 import com.color.pink.pojo.ESArticle;
+import com.color.pink.util.HTMLUtils;
 import com.color.pink.util.PageUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,12 +17,14 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,7 +165,8 @@ public class ElasticSearchService {
         }
     }
 
-    public PageUtil getDocs(PageUtil pageUtil, boolean filterOpen, boolean isOpen, boolean filterDelete, boolean isDelete) throws Exception {
+    public void getDocs(PageUtil<Map<String, Object>> pageUtil, boolean filterOpen, boolean isOpen,
+                            boolean filterDelete, boolean isDelete) throws Exception {
         Objects.requireNonNull(pageUtil);
         pageUtil.check();
         var request = new SearchRequest(INDEX_ARTICLE);
@@ -208,29 +212,63 @@ public class ElasticSearchService {
         /**
          * 设置分页查询
          */
-        searchSourceBuilder.from((pageUtil.getPageNo() - 1)* pageUtil.getPageSize());
+        searchSourceBuilder.from((pageUtil.getPageNo() - 1) * pageUtil.getPageSize());
         searchSourceBuilder.size(pageUtil.getPageSize());
 
         request.source(searchSourceBuilder);
         var response = client.search(request, RequestOptions.DEFAULT);
-        return handleSearchResponse(response, pageUtil);
+        handleSearchResponse(response, pageUtil, false);
     }
 
-    public PageUtil handleSearchResponse(SearchResponse response, PageUtil pageUtil){
+    public void  handleSearchResponse(SearchResponse response, PageUtil<Map<String, Object>> pageUtil,
+                                      Boolean isHighlight){
         pageUtil.setTotal((int) response.getHits().getTotalHits().value);
-
         var list = new ArrayList<Map<String, Object>>();
-//        response.getHits().forEach(hit -> {
-//            list.add(hit.getSourceAsMap());
-//        });
-//        pageHelper.setList(Collections.singletonList(list));
+        // 这里需要判断一下是否需要处理高亮
+        if(isHighlight) {
+            Arrays.stream(response.getHits().getHits()).forEach(x -> {
+                /**
+                下面的操作是把高亮字段替换原字段内容
+                 */
+                // 先获取高亮字段
+                var map = x.getHighlightFields();
+                // 这些是需要高亮的字段
+                String[] fields = {"title", "archive_title", "pure_txt"};
+                // 获取原字段内容
+                var sourceMap = x.getSourceAsMap();
 
-        var length = response.getHits().getHits().length;
-        for(int i = 0; i < length; ++i){
-            list.add(response.getHits().getHits()[i].getSourceAsMap());
+                // 遍历，依次处理每个需要替换高亮的字段
+                for (String s : fields){
+                    var obj = map.get(s);
+                    if(Objects.nonNull(obj)) {
+                        Text[] fragment = obj.fragments();
+                        StringBuilder builder = new StringBuilder();
+                        for(Text text: fragment){
+                            builder.append(text);
+                        }
+                        sourceMap.put(s, builder.toString());
+                    }
+                }
+                var t = map.get("tags");
+                if(Objects.nonNull(t)) {
+                    // 每个fragment是被高亮了的标签
+                    for (Text fragment : t.fragments()) {
+                        var rawTag = HTMLUtils.handleParse(fragment.toString());
+                        var rawTags = (ArrayList<String>)sourceMap.get("tags");
+                        var i = rawTags.indexOf(rawTag);
+                        if(i >= 0) {
+                            rawTags.remove(i);
+                            rawTags.add(i, fragment.toString());
+                        }
+                    }
+                }
+                list.add(sourceMap);
+            });
+        } else {
+            Arrays.stream(response.getHits().getHits()).forEach(x -> list.add(x.getSourceAsMap()));
         }
 
-        pageUtil.setList(Collections.singletonList(list));
+        pageUtil.setList(list);
 
         int p = pageUtil.getTotal() / pageUtil.getPageSize();
         if(pageUtil.getTotal() % pageUtil.getPageSize() != 0) {
@@ -277,21 +315,91 @@ public class ElasticSearchService {
         } else {
             pageUtil.setHashNext(false);
         }
-//
-//        if(!pageHelper.isHasPrevious() &&
-//                ((pageHelper.getPageNo() - 1) * pageHelper.getPageSize() + 1) <= pageHelper.getTotal()) {
-//            pageHelper.setFirst(true);
-//        } else {
-//            pageHelper.setFirst(false);
-//        }
-//
-//        if(!pageHelper.isHashNext() &&
-//                ((pageHelper.getPageNo() - 1) * pageHelper.getPageSize() + 1) < pageHelper.getTotal()) {
-//            pageHelper.setLast(true);
-//        } else {
-//            pageHelper.setLast(false);
-//        }
-        return pageUtil;
+    }
+
+
+    /**
+     * 根据关键字搜索文章，待测试
+     * @param pageUtil
+     * @param keyword
+     * @param filterOpen
+     * @param isOpen
+     * @param filterDelete
+     * @param isDelete
+     * @throws IOException
+     */
+    public void searchDocs(PageUtil<Map<String, Object>> pageUtil, String keyword, boolean filterOpen, boolean isOpen,
+                           boolean filterDelete, boolean isDelete) throws IOException {
+        var searchRequest = new SearchRequest(INDEX_ARTICLE);
+        var searchSourceBuilder = new SearchSourceBuilder();
+
+        /**
+         * 布尔查询，两个term，一个multi-match封装到布尔查询中
+         */
+        var boolQuery = QueryBuilders.boolQuery();
+        // 是否过滤是否公开的
+        if(filterOpen) {
+            var isOpenQuery = QueryBuilders.termQuery("is_open", isOpen ? 1 : 0);
+            boolQuery.must(isOpenQuery);
+        }
+        // 是否过滤是否删除的
+        if(filterDelete) {
+            var isDeleteQuery = QueryBuilders.termQuery("is_delete", isDelete ? 1 : 0);
+            boolQuery.must(isDeleteQuery);
+        }
+        searchSourceBuilder.query(boolQuery);
+
+        var multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(keyword,
+                "title", "pure_txt", "archive_title", "tags");
+        multiMatchQueryBuilder.field("title", 10);
+        multiMatchQueryBuilder.field("archive_title", 8);
+        multiMatchQueryBuilder.field("tags", 6);
+
+        boolQuery.must(multiMatchQueryBuilder);
+
+
+        /**
+         * 指定查询字段
+         * 这里的规则是: 集合includes-excludes，也就是在集合includes中，而不在excludes中的字段
+         */
+        String[] includes = Strings.EMPTY_ARRAY;
+        var list = new ArrayList<String>();
+        list.add("html");
+        list.add("markdown");
+        // 必须把不是公开的过滤掉，说明是客户端的请求，则将不需要的字段过滤掉
+        if(filterOpen&&isOpen) {
+            list.add("is_open");
+            list.add("is_delete");
+            list.add("markdown");
+        }
+        String[] excludes = new String[list.size()];
+        list.toArray(excludes);
+        var fetchSourceContext = new FetchSourceContext(true, includes, excludes);
+        searchSourceBuilder.fetchSource(fetchSourceContext);
+
+        searchSourceBuilder.sort(new FieldSortBuilder("last_update_date").order(SortOrder.DESC));
+
+        /**
+         * 设置分页查询
+         */
+        searchSourceBuilder.from((pageUtil.getPageNo() - 1) * pageUtil.getPageSize());
+        searchSourceBuilder.size(pageUtil.getPageSize());
+
+        //高亮
+        var highlightBuilder = new HighlightBuilder();
+        highlightBuilder.field("title");
+        highlightBuilder.field("archive_title");
+        highlightBuilder.field("pure_txt");
+        highlightBuilder.field("tags");
+        highlightBuilder.requireFieldMatch(true); //多个高亮显示
+        highlightBuilder.preTags("<span class='keyword' >");
+        highlightBuilder.postTags("</span>");
+        searchSourceBuilder.highlighter(highlightBuilder);
+
+        searchRequest.source(searchSourceBuilder);
+
+        var response = client.search(searchRequest, RequestOptions.DEFAULT);
+        handleSearchResponse(response, pageUtil, true);
     }
 
 

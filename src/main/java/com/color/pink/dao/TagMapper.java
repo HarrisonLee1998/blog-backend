@@ -14,6 +14,7 @@ public interface TagMapper {
     Tag selectByPrimaryKey(String id);
 
     boolean updateTitle(Tag tag);
+    Integer deleteInValidTag();
 
     List<Tag> selectAll(Boolean isAdmin);
 

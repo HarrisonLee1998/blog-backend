@@ -27,6 +27,9 @@ public class TagService {
        return tagMapper.updateTitle(tag);
     }
 
+    public Integer deleteInValidTag(){
+        return tagMapper.deleteInValidTag();
+    }
     public List<Tag>selectAllTag(){
         var tags = tagMapper.selectAll(true);
         Objects.requireNonNull(tags);

@@ -65,9 +65,15 @@ public class ArticleService {
         return list;
     }
 
-    public void selectAll(PageUtil pageUtil, boolean filterOpen, boolean isOpen,
+    public void selectAll(PageUtil<Map<String, Object>> pageUtil, boolean filterOpen, boolean isOpen,
                           boolean filterDelete, boolean isDelete) throws Exception {
         elasticSearchService.getDocs(pageUtil, filterOpen, isOpen, filterDelete, isDelete);
+        Objects.requireNonNull(pageUtil.getList());
+    }
+
+    public void searchDocs(PageUtil<Map<String, Object>> pageUtil, String keyword,  boolean filterOpen, boolean isOpen,
+                          boolean filterDelete, boolean isDelete) throws Exception {
+        elasticSearchService.searchDocs(pageUtil, keyword, filterOpen, isOpen, filterDelete, isDelete);
         Objects.requireNonNull(pageUtil.getList());
     }
 

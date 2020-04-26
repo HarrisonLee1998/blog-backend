@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -70,7 +71,7 @@ public class ESTest {
     @Test
     void testSearchDoc01() throws IOException {
         String id = "g2C31qhA9769";
-        var map = elasticSearchService.getDocById(id, true, true, true, true);
+        var map = elasticSearchService.getDocById(id, false, true, true, false);
         if (Objects.nonNull(map)) {
             map.forEach((key, value) -> {
                 System.out.println(key + " : " + value);
@@ -83,19 +84,20 @@ public class ESTest {
 
     @Test
     void testGetDocs() throws Exception {
-        var pageHelper = new PageUtil();
-        for(var i = 1; i < 5; ++i){
-            pageHelper.setPageNo(i);
-            pageHelper.setPageSize(4);
-            elasticSearchService.getDocs(pageHelper,false, true, true, false);
-            System.out.println(pageHelper);
-        }
+        var pageUtil = new PageUtil<Map<String, Object>>();
+        pageUtil.setPageNo(1);
+        pageUtil.setPageSize(5);
+        elasticSearchService.getDocs(pageUtil,false, false, true, false);
+        System.out.println(pageUtil);
+    }
 
-//        for (Object object: pageHelper.getList()) {
-//            ((Map<String,Object>)object).forEach((key, value) -> {
-//                System.out.println(key+" : "+value);
-//            });
-//            System.out.println("==========================");
-//        }
+    @Test
+    void testSearchDocs() throws IOException {
+        var pageUtil = new PageUtil<Map<String, Object>>();
+        pageUtil.setPageNo(1);
+        pageUtil.setPageSize(5);
+        elasticSearchService.searchDocs(pageUtil,"库 编译 原理" ,false, true,
+                false, true);
+        System.out.println(pageUtil);
     }
 }
