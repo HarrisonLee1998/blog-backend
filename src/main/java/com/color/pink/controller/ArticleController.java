@@ -31,13 +31,26 @@ public class ArticleController {
     @ApiOperation("发布文章")
     @PostMapping("admin/article")
     public ResponseUtil postArticle(@RequestBody @Valid Article article) throws Exception {
-        boolean result = articleService.postArticle(article);
+        var id = articleService.postArticle(article);
         var response = ResponseUtil.factory(HttpStatus.OK);
-        if(!result){
+        if(Objects.isNull(id)){
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.put("id", id);
+        return response;
+    }
+
+    @ApiOperation("修改文章")
+    @PutMapping("admin/article")
+    public ResponseUtil updateArticle(@RequestBody @Valid Article article) throws Exception {
+        var result = articleService.updateArticle(article);
+        var response = ResponseUtil.factory();
+        if(!result) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return response;
     }
+
 
     @ApiOperation("分页查询文章（请求ES）")
     @GetMapping(value = {"admin/article/{pageNo:^[1-9]\\d*$}/{pageSize:^-?[0-9]+$}",

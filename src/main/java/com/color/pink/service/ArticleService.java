@@ -77,7 +77,7 @@ public class ArticleService {
         Objects.requireNonNull(pageUtil.getList());
     }
 
-    public boolean postArticle(Article article) throws Exception {
+    public String postArticle(Article article) throws Exception {
         Integer ID_LEN = 12;
         article.setId(UUIDHelper.rand(ID_LEN));
         article.setPostDate(LocalDateTime.now());
@@ -144,7 +144,7 @@ public class ArticleService {
             throw new Exception("保存文章标签关系（博客）失败");
         }
         es.join();
-        return true;
+        return article.getId();
     }
 
     public boolean updateArticle(Article article) throws Exception {
@@ -153,6 +153,7 @@ public class ArticleService {
         if(article.getId().length() != 12){
             throw new Exception("文章ID不正确");
         }
+        article.setLastUpdateDate(LocalDateTime.now());
 
         // 新数据兵分两路，一路直接交给ES处理，另一路交给MySQL处理
 
@@ -186,7 +187,6 @@ public class ArticleService {
         C.removeAll(B);
         var D = new HashSet<>(B);
         D.removeAll(A);
-
         var tagIds = new HashSet<String>();
 
         // 删除C中标签与文章的关系
@@ -204,32 +204,36 @@ public class ArticleService {
             }
         }
         tagIds.clear();
-        // 新建D中的标签，并添加标签与文章的关系
         var nTags = new HashSet<Tag>();
         for (String s : D) {
-            var t = new Tag();
-            t.setId(UUIDHelper.rand(12));
-            t.setTitle(s);
-            t.setCreateDate(LocalDateTime.now());
-            t.setViewTimes(0);
-            t.setArticleNums(0);
+            // 判断D中的标签是不是已经在数据库中
+            if(Objects.isNull(map.get(s))) {
+                var t = new Tag();
+                t.setId(UUIDHelper.rand(12));
+                t.setTitle(s);
+                t.setCreateDate(LocalDateTime.now());
+                t.setViewTimes(0);
 
-            nTags.add(t);
-            tagIds.add(t.getId());
-            map.put(s, t);
+                nTags.add(t);
+                map.put(s, t);
+            }
+            tagIds.add(map.get(s).getId());
         }
 
         if(nTags.size() > 0) {
             result = tagService.addTags(nTags);
             if (!result) {
-                throw new Exception("删除旧标签-文章关系失败");
+                throw new Exception("保存新标签失败");
             }
         }
 
-        result = blogService.addBlogs(article.getId(), tagIds);
-        if (!result) {
-            throw new Exception("删除旧标签-文章关系失败");
+        if(tagIds.size() > 0) {
+            result = blogService.addBlogs(article.getId(), tagIds);
+            if (!result) {
+                throw new Exception("保存新标签-文章关系失败");
+            }
         }
+
         result = articleMapper.updateByPrimaryKey(article);
         es.join();
         return result;

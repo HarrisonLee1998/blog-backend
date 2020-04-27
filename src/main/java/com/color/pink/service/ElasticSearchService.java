@@ -67,6 +67,7 @@ public class ElasticSearchService {
         return RestStatus.OK.equals(response.status());
     }
 
+
     /**
      * 更新文档 测试通过
      * 参考链接：
