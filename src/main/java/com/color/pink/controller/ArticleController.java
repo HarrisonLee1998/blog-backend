@@ -51,6 +51,14 @@ public class ArticleController {
         return response;
     }
 
+    @ApiOperation("更新部分文章信息")
+    @PatchMapping("admin/article")
+    public ResponseUtil partialUpdateArticle(@RequestBody Map<String, Objects>map) {
+        var response = ResponseUtil.factory();
+
+        return response;
+    }
+
 
     @ApiOperation("分页查询文章（请求ES）")
     @GetMapping(value = {"admin/article/{pageNo:^[1-9]\\d*$}/{pageSize:^-?[0-9]+$}",

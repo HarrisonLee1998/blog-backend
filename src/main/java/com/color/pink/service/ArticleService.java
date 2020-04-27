@@ -35,6 +35,20 @@ public class ArticleService {
 
     private Map<String, Tag>map;
 
+    public boolean partialUpdateArticle(String id, Map<String, Object>map) throws InterruptedException {
+        var es = new Thread(() -> {
+            try {
+                elasticSearchService.partialUpdate(id, map);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        es.start();
+        var result = articleMapper.partialUpdateArticle(id, map);
+        es.join();
+        return result;
+    }
+
     public PageInfo<Article> getArticlesByArchiveTitle(boolean isAdmin, String archiveTitle, Integer pageNo, Integer pageSize) {
         PageHelper.startPage(pageNo, pageSize);
         var list = articleMapper.selectArticleByArchiveTitle(isAdmin, archiveTitle);

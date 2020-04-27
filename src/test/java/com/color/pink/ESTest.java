@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -99,5 +100,17 @@ public class ESTest {
         elasticSearchService.searchDocs(pageUtil,"库 编译 原理" ,false, true,
                 false, true);
         System.out.println(pageUtil);
+    }
+
+    @Test
+    void testPartialUpdate() throws Exception {
+        var id = "4fB7xxknAE0u";
+        var fields = new String[]{"is_open", "is_reward", "is_delete", "star"};
+        var flags = new Integer[]{0, 0, 1, 1000};
+        var map = new HashMap<String, Object>();
+        for(var i = 0; i < fields.length; ++i) {
+            map.put(fields[i], flags[i]);
+        }
+        System.out.println(elasticSearchService.partialUpdate(id, map));
     }
 }

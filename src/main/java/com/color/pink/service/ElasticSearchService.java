@@ -53,6 +53,7 @@ public class ElasticSearchService {
 
     /**
      * 添加文档 测试通过
+     *
      * @param article
      * @return
      * @throws IOException
@@ -69,9 +70,29 @@ public class ElasticSearchService {
 
 
     /**
+     *
+     * @param id
+     * @param fields
+     * @param flags
+     * @return
+     * @throws Exception
+     */
+    public boolean partialUpdate(String id, Map<String, Object>map) throws Exception {
+        if(Objects.isNull(id) || id.isBlank()){
+            throw  new Exception("id不能为空");
+        }
+        Objects.requireNonNull(map);
+        var request = new UpdateRequest(INDEX_ARTICLE, id);
+        request.doc(map);
+        var response = client.update(request, RequestOptions.DEFAULT);
+        return response.getResult() == DocWriteResponse.Result.UPDATED;
+    }
+
+    /**
      * 更新文档 测试通过
      * 参考链接：
      * https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.6/java-rest-high-document-update.html
+     *
      * @param article
      * @return
      * @throws IOException
@@ -90,7 +111,7 @@ public class ElasticSearchService {
 
     public boolean updateArticleStar(String id) throws Exception {
         Objects.requireNonNull(id);
-        if(id.length() != 12) {
+        if (id.length() != 12) {
             throw new Exception("无效ID");
         }
         return false;
@@ -98,11 +119,12 @@ public class ElasticSearchService {
 
     /**
      * 根据ID查询文章，无条件限制 测试通过
+     *
      * @param id
      * @return
      * @throws IOException
      */
-    public Map<String, Object> getDocById(String  id) throws IOException {
+    public Map<String, Object> getDocById(String id) throws IOException {
         var request = new GetRequest(INDEX_ARTICLE, id);
         String[] includes = Strings.EMPTY_ARRAY;
         String[] excludes = {"is_delete", "is_open", "pure_txt"};
@@ -115,19 +137,20 @@ public class ElasticSearchService {
 
     /**
      * 根据ID来查询文档，有响应的条件限制，测试通过
+     *
      * @param id
      * @param isOpen
      * @return
      * @throws IOException
      */
-    public Map<String, Object> getDocById(String  id, Boolean filterOpen, boolean isOpen,
-                                                boolean filterDelete, boolean isDelete) throws IOException {
+    public Map<String, Object> getDocById(String id, Boolean filterOpen, boolean isOpen,
+                                          boolean filterDelete, boolean isDelete) throws IOException {
         var request = new SearchRequest(INDEX_ARTICLE);
         String[] includes = Strings.EMPTY_ARRAY;
         var list = new ArrayList<String>();
         list.add("pure_txt");
         // 必须把不是公开的过滤掉，说明是客户端的请求，则将不需要的字段过滤掉
-        if(filterOpen&&isOpen) {
+        if (filterOpen && isOpen) {
             list.add("is_open");
             list.add("is_delete");
             list.add("markdown");
@@ -137,11 +160,11 @@ public class ElasticSearchService {
         var fetchSourceContext = new FetchSourceContext(true, includes, excludes);
         var searchSourceBuilder = new SearchSourceBuilder();
         var queryBuilder = QueryBuilders.boolQuery();
-        if(filterOpen) {
+        if (filterOpen) {
             var isOpenQuery = QueryBuilders.termQuery("is_open", isOpen ? 1 : 0);
             queryBuilder.must(isOpenQuery);
         }
-        if(filterDelete) {
+        if (filterDelete) {
             var isDeleteQuery = QueryBuilders.termQuery("is_delete", isDelete ? 1 : 0);
             queryBuilder.must(isDeleteQuery);
         }
@@ -159,7 +182,7 @@ public class ElasticSearchService {
         searchSourceBuilder.size(1);
 
         var response = client.search(request, RequestOptions.DEFAULT);
-        if(response.getHits().getTotalHits().value > 0) {
+        if (response.getHits().getTotalHits().value > 0) {
             return response.getHits().getAt(0).getSourceAsMap();
         } else {
             return null;
@@ -167,7 +190,7 @@ public class ElasticSearchService {
     }
 
     public void getDocs(PageUtil<Map<String, Object>> pageUtil, boolean filterOpen, boolean isOpen,
-                            boolean filterDelete, boolean isDelete) throws Exception {
+                        boolean filterDelete, boolean isDelete) throws Exception {
         Objects.requireNonNull(pageUtil);
         pageUtil.check();
         var request = new SearchRequest(INDEX_ARTICLE);
@@ -176,14 +199,14 @@ public class ElasticSearchService {
         searchSourceBuilder.query(matchAllQueryBuilder);
         var queryBuilder = QueryBuilders.boolQuery();
         // 是否过滤是否公开的
-        if(filterOpen) {
+        if (filterOpen) {
             var isOpenQuery = QueryBuilders.termQuery("is_open", isOpen ? 1 : 0);
             queryBuilder.must(isOpenQuery);
         }
         // 是否过滤是否删除的
-        if(filterDelete) {
+        if (filterDelete) {
             var isDeleteQuery = QueryBuilders.termQuery("is_delete", isDelete ? 1 : 0);
-           queryBuilder.must(isDeleteQuery);
+            queryBuilder.must(isDeleteQuery);
         }
         searchSourceBuilder.query(queryBuilder);
         /**
@@ -194,7 +217,7 @@ public class ElasticSearchService {
         var list = new ArrayList<String>();
         list.add("pure_txt");
         // 必须把不是公开的过滤掉，说明是客户端的请求，则将不需要的字段过滤掉
-        if(filterOpen&&isOpen) {
+        if (filterOpen && isOpen) {
             list.add("is_open");
             list.add("is_delete");
             list.add("markdown");
@@ -221,15 +244,15 @@ public class ElasticSearchService {
         handleSearchResponse(response, pageUtil, false);
     }
 
-    public void  handleSearchResponse(SearchResponse response, PageUtil<Map<String, Object>> pageUtil,
-                                      Boolean isHighlight){
+    public void handleSearchResponse(SearchResponse response, PageUtil<Map<String, Object>> pageUtil,
+                                     Boolean isHighlight) {
         pageUtil.setTotal((int) response.getHits().getTotalHits().value);
         var list = new ArrayList<Map<String, Object>>();
         // 这里需要判断一下是否需要处理高亮
-        if(isHighlight) {
+        if (isHighlight) {
             Arrays.stream(response.getHits().getHits()).forEach(x -> {
                 /**
-                下面的操作是把高亮字段替换原字段内容
+                 下面的操作是把高亮字段替换原字段内容
                  */
                 // 先获取高亮字段
                 var map = x.getHighlightFields();
@@ -239,25 +262,25 @@ public class ElasticSearchService {
                 var sourceMap = x.getSourceAsMap();
 
                 // 遍历，依次处理每个需要替换高亮的字段
-                for (String s : fields){
+                for (String s : fields) {
                     var obj = map.get(s);
-                    if(Objects.nonNull(obj)) {
+                    if (Objects.nonNull(obj)) {
                         Text[] fragment = obj.fragments();
                         StringBuilder builder = new StringBuilder();
-                        for(Text text: fragment){
+                        for (Text text : fragment) {
                             builder.append(text);
                         }
                         sourceMap.put(s, builder.toString());
                     }
                 }
                 var t = map.get("tags");
-                if(Objects.nonNull(t)) {
+                if (Objects.nonNull(t)) {
                     // 每个fragment是被高亮了的标签
                     for (Text fragment : t.fragments()) {
                         var rawTag = HTMLUtils.handleParse(fragment.toString());
-                        var rawTags = (ArrayList<String>)sourceMap.get("tags");
+                        var rawTags = (ArrayList<String>) sourceMap.get("tags");
                         var i = rawTags.indexOf(rawTag);
-                        if(i >= 0) {
+                        if (i >= 0) {
                             rawTags.remove(i);
                             rawTags.add(i, fragment.toString());
                         }
@@ -272,7 +295,7 @@ public class ElasticSearchService {
         pageUtil.setList(list);
 
         int p = pageUtil.getTotal() / pageUtil.getPageSize();
-        if(pageUtil.getTotal() % pageUtil.getPageSize() != 0) {
+        if (pageUtil.getTotal() % pageUtil.getPageSize() != 0) {
             p += 1;
         }
         pageUtil.setPages(p);
@@ -281,7 +304,7 @@ public class ElasticSearchService {
          * 如果有数据，直接根据pageNo == 1即可判断是否是第一页
          * 如果没有数据，则需要再判断当前页码小于等于总页数
          */
-        if(pageUtil.getPageNo() == 1 && pageUtil.getPageNo() <= pageUtil.getPages()) {
+        if (pageUtil.getPageNo() == 1 && pageUtil.getPageNo() <= pageUtil.getPages()) {
             pageUtil.setFirst(true);
         } else {
             pageUtil.setFirst(false);
@@ -290,7 +313,7 @@ public class ElasticSearchService {
         /**
          * 直接判断当前页码是否等于总页数即可，因为如果数据为空的话，那么pages就为0了
          */
-        if(pageUtil.getPageNo() == pageUtil.getPages()) {
+        if (pageUtil.getPageNo() == pageUtil.getPages()) {
             pageUtil.setLast(true);
         } else {
             pageUtil.setLast(false);
@@ -304,14 +327,14 @@ public class ElasticSearchService {
          * (pageHelper.getPageSize() * (pageHelper.getPageNo() - 2) + 1)
          *  正是前一页第一个元素的下标（从1开始）
          */
-        if(pageUtil.getPageNo() > 1 &&
+        if (pageUtil.getPageNo() > 1 &&
                 (pageUtil.getPageSize() * (pageUtil.getPageNo() - 2) + 1) <= pageUtil.getTotal()) {
             pageUtil.setHasPrevious(true);
         } else {
             pageUtil.setHasPrevious(false);
         }
 
-        if(((pageUtil.getPageNo()) * pageUtil.getPageSize() + 1) <= pageUtil.getTotal()) {
+        if (((pageUtil.getPageNo()) * pageUtil.getPageSize() + 1) <= pageUtil.getTotal()) {
             pageUtil.setHashNext(true);
         } else {
             pageUtil.setHashNext(false);
@@ -321,6 +344,7 @@ public class ElasticSearchService {
 
     /**
      * 根据关键字搜索文章，待测试
+     *
      * @param pageUtil
      * @param keyword
      * @param filterOpen
@@ -339,12 +363,12 @@ public class ElasticSearchService {
          */
         var boolQuery = QueryBuilders.boolQuery();
         // 是否过滤是否公开的
-        if(filterOpen) {
+        if (filterOpen) {
             var isOpenQuery = QueryBuilders.termQuery("is_open", isOpen ? 1 : 0);
             boolQuery.must(isOpenQuery);
         }
         // 是否过滤是否删除的
-        if(filterDelete) {
+        if (filterDelete) {
             var isDeleteQuery = QueryBuilders.termQuery("is_delete", isDelete ? 1 : 0);
             boolQuery.must(isDeleteQuery);
         }
@@ -368,7 +392,7 @@ public class ElasticSearchService {
         list.add("html");
         list.add("markdown");
         // 必须把不是公开的过滤掉，说明是客户端的请求，则将不需要的字段过滤掉
-        if(filterOpen&&isOpen) {
+        if (filterOpen && isOpen) {
             list.add("is_open");
             list.add("is_delete");
             list.add("markdown");
@@ -406,11 +430,12 @@ public class ElasticSearchService {
 
     /**
      * 批量插入，测试通过
+     *
      * @param list
      * @return
      * @throws IOException
      */
-    public boolean bulkInsert(List<Article>list) throws IOException {
+    public boolean bulkInsert(List<Article> list) throws IOException {
         var esArticles = new ArrayList<ESArticle>();
         for (Article article : list) {
             esArticles.add(new ESArticle(article));
@@ -420,7 +445,7 @@ public class ElasticSearchService {
             try {
                 request.add(
                         new IndexRequest().id(e.getId())
-                        .source(objectMapper.writeValueAsString(e), XContentType.JSON)
+                                .source(objectMapper.writeValueAsString(e), XContentType.JSON)
                 );
             } catch (JsonProcessingException ex) {
                 ex.printStackTrace();

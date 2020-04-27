@@ -4,6 +4,7 @@ import com.color.pink.pojo.Article;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface ArticleMapper {
@@ -15,6 +16,9 @@ public interface ArticleMapper {
     List<Article> selectByTag(@Param("isAdmin") Boolean isAdmin, @Param("tagId") String tagId);
 
     boolean updateByPrimaryKey(Article record);
+
+    boolean partialUpdateArticle(@Param("id") String id, @Param("map") Map<String, Object>map);
+
 
     boolean postArticle(Article article);
 

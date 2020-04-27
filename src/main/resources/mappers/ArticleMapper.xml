@@ -47,6 +47,13 @@
       html = #{html,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
+  <update id="partialUpdateArticle">
+    UPDATE article SET 
+    <foreach item="value" index="key" collection="map.entrySet()" open="(" close=")" separator=",">
+      #{key} = #{value}
+    </foreach>
+     WHERE id = #{id}
+  </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select id, title, star, view_times, is_open, is_delete, post_date, last_update_date, 
     archive_title, is_reward, markdown, html
