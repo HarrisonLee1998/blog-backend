@@ -35,6 +35,21 @@ public class ArticleService {
 
     private Map<String, Tag>map;
 
+
+    public boolean deleteArticle(String id) throws InterruptedException {
+        var es = new Thread(() -> {
+            try {
+                elasticSearchService.deleteArticle(id);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        es.start();
+        articleMapper.deleteByPrimaryKey(id);
+        es.join();
+        return true;
+    }
+
     public boolean partialUpdateArticle(String id, Map<String, Object>map) throws InterruptedException {
         var es = new Thread(() -> {
             try {

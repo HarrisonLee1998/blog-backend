@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -69,11 +70,16 @@ public class ElasticSearchService {
     }
 
 
+    public boolean deleteArticle(String id) throws IOException {
+        var request = new DeleteRequest(INDEX_ARTICLE, id);
+        var response = client.delete(request, RequestOptions.DEFAULT);
+        return response.getResult() == DocWriteResponse.Result.DELETED;
+    }
+
     /**
      *
      * @param id
-     * @param fields
-     * @param flags
+     * @param map
      * @return
      * @throws Exception
      */
@@ -84,6 +90,9 @@ public class ElasticSearchService {
         Objects.requireNonNull(map);
         var request = new UpdateRequest(INDEX_ARTICLE, id);
         request.doc(map);
+        request.timeout(new TimeValue(2, TimeUnit.SECONDS));
+        // 要求更新后立即刷新
+        request.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
         var response = client.update(request, RequestOptions.DEFAULT);
         return response.getResult() == DocWriteResponse.Result.UPDATED;
     }

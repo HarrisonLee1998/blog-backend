@@ -49,8 +49,16 @@
   </update>
   <update id="partialUpdateArticle">
     UPDATE article SET 
-    <foreach item="value" index="key" collection="map.entrySet()" open="(" close=")" separator=",">
-      #{key} = #{value}
+    <foreach item="value" index="key" collection="map.entrySet()" separator=",">
+      <if test="key == 'is_open'">
+        is_open = #{value}
+      </if>
+      <if test="key == 'is_delete'">
+        is_delete = #{value}
+      </if>
+      <if test="key == 'is_reward'">
+        is_reward = #{value}
+      </if>
     </foreach>
      WHERE id = #{id}
   </update>

@@ -40,6 +40,14 @@ public class ArticleController {
         return response;
     }
 
+    @ApiOperation("删除文章")
+    @DeleteMapping("admin/article")
+    public ResponseUtil deleteArticle(@RequestParam String id) throws InterruptedException {
+        var response = ResponseUtil.factory();
+        articleService.deleteArticle(id);
+        return response;
+    }
+
     @ApiOperation("修改文章")
     @PutMapping("admin/article")
     public ResponseUtil updateArticle(@RequestBody @Valid Article article) throws Exception {
@@ -53,9 +61,12 @@ public class ArticleController {
 
     @ApiOperation("更新部分文章信息")
     @PatchMapping("admin/article")
-    public ResponseUtil partialUpdateArticle(@RequestBody Map<String, Objects>map) {
+    public ResponseUtil partialUpdateArticle(@RequestBody Map<String, Object>map) throws InterruptedException {
         var response = ResponseUtil.factory();
-
+        String id = (String) map.get("id");
+        Objects.requireNonNull(id);
+        map.remove("id");
+        articleService.partialUpdateArticle(id, map);
         return response;
     }
 
@@ -76,10 +87,10 @@ public class ArticleController {
         var response = ResponseUtil.factory(HttpStatus.OK);
         if(request.getRequestURI().startsWith("/article")) {
             articleService.selectAll(pageUtil, true, true, true, false);
-        }else if(request.getRequestURI().startsWith("/admin/article")) {
-            articleService.selectAll(pageUtil, false, false, true, false);
-        }else{
+        }else if(request.getRequestURI().startsWith("/admin/article/recycle")) {
             articleService.selectAll(pageUtil, false, false, true, true);
+        }else{
+            articleService.selectAll(pageUtil, false, false, true, false);
         }
         response.put("pageUtil", pageUtil);
         return response;
@@ -89,7 +100,7 @@ public class ArticleController {
     @ApiOperation("根据关键词搜索文章（请求ES）")
     @GetMapping(value = {"admin/article/search",
             "article/search",
-            "admin/article/recycle/search}"})
+            "admin/article/recycle/search"})
     public ResponseUtil searchDocs(HttpServletRequest request,
                                    @Valid PageUtil<Map<String, Object>>pageUtil,
                                    @NotBlank String keyword) throws Exception {
@@ -99,10 +110,10 @@ public class ArticleController {
         var response = ResponseUtil.factory(HttpStatus.OK);
         if(request.getRequestURI().startsWith("/article")) {
             articleService.searchDocs(pageUtil, keyword, true, true, true, false);
-        }else if(request.getRequestURI().startsWith("/admin/article")) {
-            articleService.searchDocs(pageUtil, keyword, false, false, true, false);
+        }else if(request.getRequestURI().startsWith("/admin/article/recycle")) {
+            articleService.searchDocs(pageUtil, keyword, false, false, true, true);
         }else{
-            articleService.searchDocs(pageUtil, keyword,false, false, true, true);
+            articleService.searchDocs(pageUtil, keyword,false, false, true, false);
         }
         response.put("pageUtil", pageUtil);
         return response;
