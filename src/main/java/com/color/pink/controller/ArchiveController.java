@@ -29,10 +29,20 @@ public class ArchiveController {
         archiveService.addArchive(archive);
         return ResponseUtil.factory(HttpStatus.OK);
     }
-    @ApiOperation("查询所有归档")
-    @GetMapping(value = {"admin/archive", "archive"})
-    public ResponseUtil selectAll(HttpServletRequest request){
-        var list = archiveService.selectAll(request.getRequestURI().startsWith("/admin"));
+
+    @ApiOperation("查询所有归档(不查询附属文章)")
+    @GetMapping(value = {"archive"})
+    public ResponseUtil selectAllForClient(){
+        var archives = archiveService.selectAllForClient();
+        Objects.requireNonNull(archives);
+        var response = ResponseUtil.factory();
+        response.put("archives", archives);
+        return response;
+    }
+    @ApiOperation("Admin查询所有归档")
+    @GetMapping(value = {"admin/archive"})
+    public ResponseUtil selectAllForAdmin(){
+        var list = archiveService.selectAllForAdmin();
         Objects.requireNonNull(list);
         return ResponseUtil.factory(HttpStatus.OK).put("archives", list);
     }

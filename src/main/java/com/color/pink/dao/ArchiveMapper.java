@@ -7,7 +7,8 @@ import java.util.List;
 
 public interface ArchiveMapper {
     List<Archive> selectAll();
-    List<Archive> selectAll2();
+    List<Archive> selectAllForAdmin();
+    List<Archive> selectAllForClient();
     boolean addArchive(Archive archive);
     Archive getArchiveByTitle(@Param("isAdmin") Boolean isAdmin,
                               @Param("archiveTitle") String archiveTitle);

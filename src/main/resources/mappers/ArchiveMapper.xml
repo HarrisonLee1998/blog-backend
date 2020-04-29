@@ -15,12 +15,22 @@
     <association property="articles" select="com.color.pink.dao.ArticleMapper.selectArticleByArchive2" column="title"/>
   </resultMap>
 
-  <select id="selectAll" resultMap="BaseResultMap">
+  <resultMap id="ResultMapWithoutArticle" type="com.color.pink.pojo.Archive">
+    <id column="title" jdbcType="VARCHAR" property="title" />
+    <result column="a_order" jdbcType="INTEGER" property="order" />
+    <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
+  </resultMap>
+
+  <select id="selectAll" resultMap="ResultMapWithoutArticle">
+    SELECT * FROM archive
+  </select>
+
+  <select id="selectAllForAdmin" resultMap="BaseResultMap">
     SELECT title, img_url, a_order
     FROM archive ORDER BY a_order
   </select>
 
-  <select id="selectAll2" resultMap="BaseResultMap2">
+  <select id="selectAllForClient" resultMap="BaseResultMap2">
     SELECT title, img_url, a_order
     FROM archive ORDER BY a_order
   </select>
@@ -33,7 +43,7 @@
   <select id="getArchiveByTitle" parameterType="java.lang.String" resultType="com.color.pink.pojo.Archive">
     SELECT * FROM archive WHERE title = #{archiveTitle}
     <if test="!isAdmin">
-      AND (SELECT COUNT(*) FROM article WHERE archive_title = #{archiveTitle}) > 0
+      AND (SELECT COUNT(*) FROM article WHERE archive_title = #{archiveTitle} AND is_open = 1) > 0
     </if>
   </select>
 </mapper>

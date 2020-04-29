@@ -14,11 +14,13 @@ public interface TagMapper {
     Tag selectByPrimaryKey(String id);
 
     boolean updateTitle(Tag tag);
-    Integer deleteInValidTag();
+    int deleteInValidTag();
 
     List<Tag> selectAll(Boolean isAdmin);
 
     int updateByPrimaryKey(Tag record);
+
+    int testTagByTitle(String title);
 
     Set<String> selectAllTagTitle();
 

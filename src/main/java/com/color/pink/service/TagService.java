@@ -36,6 +36,10 @@ public class TagService {
         return tags;
     }
 
+    public boolean testTagByTitle(String title) {
+        return tagMapper.testTagByTitle(title) > 0;
+    }
+
     public List<Tag> selectAll(Boolean isAdmin) {
         var tags = tagMapper.selectAll(isAdmin);
         Objects.requireNonNull(tags);

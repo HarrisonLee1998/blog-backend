@@ -88,18 +88,18 @@
   </insert>
 
   <select id="selectArticleByArchive" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
-    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_delete = 0 ORDER BY last_update_date DESC limit 6
+    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_delete = 0 ORDER BY last_update_date DESC
   </select>
 
   <select id="selectArticleByArchive2" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
-    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0 ORDER BY last_update_date DESC limit 6
+    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0 ORDER BY last_update_date DESC
   </select>
 
   <select id="selectArticleByArchiveTitle" resultType="com.color.pink.pojo.Article">
     SELECT id, title, last_update_date FROM article
     WHERE archive_title = #{archiveTitle} AND is_delete = 0
     <if test="!isAdmin">
-      AND is_open = 1;
+      AND is_open = 1
     </if>
     ORDER BY last_update_date DESC
   </select>

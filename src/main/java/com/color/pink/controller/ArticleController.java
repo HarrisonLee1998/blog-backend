@@ -169,11 +169,12 @@ public class ArticleController {
         PageInfo<Article> pageInfo;
         var isAdmin = request.getRequestURI().startsWith("/admin");
         pageInfo = articleService.getArticlesByArchiveTitle(isAdmin, archiveTitle, pageNo, pageSize);
-        if((Objects.isNull(pageInfo) || pageInfo.getTotal() == 0) && !isAdmin) {
-            response.setStatus(HttpStatus.NOT_FOUND);
-        } else {
-            response.put("pageInfo", pageInfo);
-        }
+//        if((Objects.isNull(pageInfo) || pageInfo.getTotal() == 0) && !isAdmin) {
+////            response.setStatus(HttpStatus.NOT_FOUND);
+////        } else {
+////            response.put("pageInfo", pageInfo);
+////        }
+        response.put("pageInfo", pageInfo);
         return response;
     }
 }

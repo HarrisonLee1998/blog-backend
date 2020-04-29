@@ -224,7 +224,8 @@ public class ElasticSearchService {
          */
         String[] includes = Strings.EMPTY_ARRAY;
         var list = new ArrayList<String>();
-        list.add("pure_txt");
+        list.add("html");
+        list.add("markdown");
         // 必须把不是公开的过滤掉，说明是客户端的请求，则将不需要的字段过滤掉
         if (filterOpen && isOpen) {
             list.add("is_open");

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author HarrisonLee
@@ -23,9 +24,18 @@ public class ArchiveService {
         return archiveMapper.addArchive(archive);
     }
 
-    public List<Archive> selectAll(boolean admin){
-        var list = admin? archiveMapper.selectAll(): archiveMapper.selectAll2();
-        list.sort(Comparator.comparingInt(x -> x.getOrder()));
+    public List<Archive> selectAllForClient(){
+        var list = archiveMapper.selectAllForClient();
+        list = list.stream().filter(x -> x.getArticles().size() > 0).collect(Collectors.toList());
+        list.sort(Comparator.comparingInt(Archive::getOrder));
+        Objects.requireNonNull(list);
+        return list;
+    }
+
+
+    public List<Archive> selectAllForAdmin(){
+        var list = archiveMapper.selectAllForAdmin();
+        list.sort(Comparator.comparingInt(Archive::getOrder));
         Objects.requireNonNull(list);
         return list;
     }

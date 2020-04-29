@@ -82,4 +82,14 @@ public class TagController {
         return response;
     }
 
+    @ApiOperation("验证标签是否存在")
+    @GetMapping(value = {"tag/test/{title}"})
+    public ResponseUtil testTagByTitle(@PathVariable String title) {
+        var response = ResponseUtil.factory();
+        var result = tagService.testTagByTitle(title);
+        if(!result) {
+            response.setStatus(HttpStatus.NOT_FOUND);
+        }
+        return response;
+    }
 }

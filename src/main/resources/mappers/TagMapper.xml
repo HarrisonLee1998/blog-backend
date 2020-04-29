@@ -94,4 +94,9 @@
   <select id="selectTagsTitleByArticleId" resultType="java.lang.String" parameterType="java.lang.String">
     SELECT t.title FROM tag AS t, blog AS b WHERE t.id = b.tag_id AND b.art_id = #{artId}
   </select>
+
+  <select id="testTagByTitle" resultType="java.lang.Integer" parameterType="java.lang.String">
+    SELECT COUNT(a.id) FROM tag AS t, blog AS b, article AS a WHERE t.title = #{title}
+    AND t.id = b.tag_id AND a.id = b.art_id AND a.is_open = 1 AND a.is_delete = 0
+  </select>
 </mapper>
