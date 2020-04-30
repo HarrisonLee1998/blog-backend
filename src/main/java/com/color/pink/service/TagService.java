@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,14 +31,19 @@ public class TagService {
     public Integer deleteInValidTag(){
         return tagMapper.deleteInValidTag();
     }
-    public List<Tag>selectAllTag(){
-        var tags = tagMapper.selectAll(true);
-        Objects.requireNonNull(tags);
-        return tags;
-    }
 
-    public boolean testTagByTitle(String title) {
-        return tagMapper.testTagByTitle(title) > 0;
+    /**
+     * 测试标签是否存在
+     * @param title
+     * @param isAdmin
+     * @return
+     */
+    public boolean testTagByTitle(Boolean isAdmin, String title) {
+        if(isAdmin) {
+            return tagMapper.testTagForAdmin(title) > 0;
+        } else {
+            return tagMapper.testTagForClient(title) > 0;
+        }
     }
 
     public List<Tag> selectAll(Boolean isAdmin) {
@@ -51,6 +57,24 @@ public class TagService {
         return tags;
     }
 
+    /**
+     * 此方法在发布文章时调用
+     * 此方法不被外部Controller调用
+     * @return
+     */
+    public Map<String, Tag> selectAllIdAndTitle(){
+        return tagMapper.selectAllIdAndTitle();
+    }
+
+    /**
+     * Admin分页查询标签，其实没有被调用
+     * @param isAdmin
+     * @param pageNo
+     * @param pageSize
+     * @param sortBy
+     * @param sortDesc
+     * @return
+     */
     public PageInfo<Tag> selectAllByPage(Boolean isAdmin,
                                          Integer pageNo,
                                          Integer pageSize,
@@ -73,6 +97,11 @@ public class TagService {
         return titles;
     }
 
+    /**
+     * 在发布文章时，可能需要添加标签
+     * @param tags
+     * @return
+     */
     public boolean addTags(Set<Tag>tags){
         return tagMapper.addTags(tags);
     }

@@ -83,10 +83,10 @@ public class TagController {
     }
 
     @ApiOperation("验证标签是否存在")
-    @GetMapping(value = {"tag/test/{title}"})
-    public ResponseUtil testTagByTitle(@PathVariable String title) {
+    @GetMapping(value = {"admin/tag/test/{title}", "tag/test/{title}"})
+    public ResponseUtil testTagByTitle(HttpServletRequest request, @PathVariable String title) {
         var response = ResponseUtil.factory();
-        var result = tagService.testTagByTitle(title);
+        var result = tagService.testTagByTitle(request.getRequestURI().startsWith("/admin"), title);
         if(!result) {
             response.setStatus(HttpStatus.NOT_FOUND);
         }

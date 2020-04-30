@@ -268,11 +268,8 @@ public class ArticleService {
         return result;
     }
 
-    public void fillMap(){
-        var tags = tagService.selectAllTag();
-        map = new HashMap<>();
-        tags.forEach(t -> map.put(t.getTitle(), t));
+    public void fillMap() {
+        map = tagService.selectAllIdAndTitle();
     }
-
 }
 

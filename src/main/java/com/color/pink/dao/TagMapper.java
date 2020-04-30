@@ -1,26 +1,24 @@
 package com.color.pink.dao;
 
 import com.color.pink.pojo.Tag;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface TagMapper {
-    int deleteByPrimaryKey(String id);
-
-    int insert(Tag record);
-
-    Tag selectByPrimaryKey(String id);
-
     boolean updateTitle(Tag tag);
     int deleteInValidTag();
 
     List<Tag> selectAll(Boolean isAdmin);
 
-    int updateByPrimaryKey(Tag record);
+    @MapKey("title")
+    Map<String, Tag>selectAllIdAndTitle();
 
-    int testTagByTitle(String title);
+    int testTagForClient(String title);
+    int testTagForAdmin(String title);
 
     Set<String> selectAllTagTitle();
 

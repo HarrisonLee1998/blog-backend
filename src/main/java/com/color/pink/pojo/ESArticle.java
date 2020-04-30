@@ -1,10 +1,11 @@
 package com.color.pink.pojo;
 
-import com.color.pink.util.HTMLUtils;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Node;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -64,7 +65,7 @@ public class ESArticle {
     private String pure_txt;
 
     public ESArticle(Article article) throws IOException {
-        this.pure_txt = HTMLUtils.handleParse(article.getHtml());
+        this.pure_txt = parse(article.getHtml());
         var f = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.post_date = f.format(article.getPostDate());
         this.last_update_date = f.format(article.getLastUpdateDate());
@@ -81,5 +82,12 @@ public class ESArticle {
         this.is_reward = article.getIsReward();
         this.viewTimes = article.getViewTimes();
         this.tags = article.getTags();
+    }
+
+    public static String parse(String s) {
+        var html = Jsoup.parse(s);
+        html.getElementsByTag("pre").forEach(Node::remove);
+        html.getElementsByClass("katex-display").forEach(Node::remove);
+        return html.text();
     }
 }

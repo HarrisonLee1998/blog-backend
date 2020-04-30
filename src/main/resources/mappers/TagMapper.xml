@@ -9,14 +9,6 @@
     <result property="articleNums" jdbcType="INTEGER" column="article_nums"/>
   </resultMap>
 
-  <resultMap id="BaseResultMap2" type="com.color.pink.pojo.Tag">
-    <id column="id" jdbcType="CHAR" property="id" />
-    <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
-    <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
-    <result property="articleNums" jdbcType="INTEGER" column="articleNums"/>
-  </resultMap>
-
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tag
     where id = #{id,jdbcType=CHAR}
@@ -53,6 +45,10 @@
     from tag
     where id = #{id,jdbcType=CHAR}
   </select>
+
+  <select id="selectAllIdAndTitle" resultType="com.color.pink.pojo.Tag">
+    SELECT id, title from tag
+  </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select t.id, t.title, t.create_date, t.view_times, COUNT(*) as article_nums
     FROM tag as t, blog as b, article as a
@@ -61,22 +57,6 @@
       AND a.is_open = 1
     </if>
     GROUP BY t.id
-<!--    这里选择由pageHelper实现 ORDER BY-->
-<!--    <if test="sortBy == 0">-->
-<!--      create_date-->
-<!--    </if>-->
-<!--    <if test="sortBy == 1">-->
-<!--      view_times-->
-<!--    </if>-->
-<!--    <if test="sortBy == 2">-->
-<!--      article_nums-->
-<!--    </if>-->
-<!--    <if test="sortDesc == 1">-->
-<!--      DESC-->
-<!--    </if>-->
-<!--    <if test="sortDesc == 0">-->
-<!--      ASC-->
-<!--    </if>-->
   </select>
 
   <select id="selectAllTagTitle" resultType="java.lang.String">
@@ -95,8 +75,12 @@
     SELECT t.title FROM tag AS t, blog AS b WHERE t.id = b.tag_id AND b.art_id = #{artId}
   </select>
 
-  <select id="testTagByTitle" resultType="java.lang.Integer" parameterType="java.lang.String">
+  <select id="testTagForClient" resultType="java.lang.Integer" parameterType="java.lang.String">
     SELECT COUNT(a.id) FROM tag AS t, blog AS b, article AS a WHERE t.title = #{title}
     AND t.id = b.tag_id AND a.id = b.art_id AND a.is_open = 1 AND a.is_delete = 0
+  </select>
+
+  <select id="testTagForAdmin" resultType="java.lang.Integer" parameterType="java.lang.String">
+    SELECT COUNT(*) FROM tag WHERE title = #{title}
   </select>
 </mapper>
