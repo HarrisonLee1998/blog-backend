@@ -15,6 +15,8 @@ public interface ArticleMapper {
     List<Article> selectAll();
     List<Article> selectByTag(@Param("isAdmin") Boolean isAdmin, @Param("tagId") String tagId);
 
+    List<Article> getArticleForSEO();
+
     boolean updateByPrimaryKey(Article record);
 
     boolean partialUpdateArticle(@Param("id") String id, @Param("map") Map<String, Object>map);

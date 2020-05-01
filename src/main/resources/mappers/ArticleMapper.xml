@@ -103,4 +103,9 @@
     </if>
     ORDER BY last_update_date DESC
   </select>
+
+  <select id="getArticleForSEO" resultType="com.color.pink.pojo.Article">
+    SELECT id, title FROM article WHERE is_open = 1 AND is_delete = 0
+    ORDER BY last_update_date DESC
+  </select>
 </mapper>

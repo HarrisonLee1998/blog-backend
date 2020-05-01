@@ -177,4 +177,13 @@ public class ArticleController {
         response.put("pageInfo", pageInfo);
         return response;
     }
+
+    @ApiOperation("seo查询文章")
+    @GetMapping("article/seo")
+    public ResponseUtil getArticleForSEO(){
+        var response = new ResponseUtil();
+        var articles = articleService.getArticleForSEO();
+        response.put("articles", articles);
+        return response;
+    }
 }

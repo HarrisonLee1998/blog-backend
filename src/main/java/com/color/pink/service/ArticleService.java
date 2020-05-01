@@ -36,6 +36,10 @@ public class ArticleService {
     private Map<String, Tag>map;
 
 
+    public List<Article> getArticleForSEO() {
+        return articleMapper.getArticleForSEO();
+    }
+
     public boolean deleteArticle(String id) throws InterruptedException {
         var es = new Thread(() -> {
             try {

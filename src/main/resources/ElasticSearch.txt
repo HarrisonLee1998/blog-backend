@@ -3,8 +3,7 @@ PUT article
   "mappings": {
     "properties": {
       "id": {
-        "type": "text",
-        "index": true
+        "type": "keyword"
       },
       "title": {
         "type": "text",
@@ -23,30 +22,24 @@ PUT article
         "analyzer": "ik_max_word"
       },
       "star": {
-        "type": "integer",
-        "index": false
+        "type": "integer"
       },
       "is_open": {
-        "type": "integer",
-        "index": true
+        "type": "integer"
       },
       "is_delete": {
-        "type": "integer",
-        "index": true
+        "type": "integer"
       },
       "is_reward": {
-        "type": "integer",
-        "index": true
+        "type": "integer"
       },
       "post_date": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss",
-        "index": true
+        "format": "yyyy-MM-dd HH:mm:ss"
       },
       "last_update_date": {
         "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss",
-        "index": true
+        "format": "yyyy-MM-dd HH:mm:ss"
       },
       "archive_title": {
         "type": "text",
