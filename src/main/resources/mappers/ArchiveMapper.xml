@@ -46,4 +46,9 @@
       AND (SELECT COUNT(*) FROM article WHERE archive_title = #{archiveTitle} AND is_open = 1) > 0
     </if>
   </select>
+
+  <select id="selectArchiveArticleNums" resultType="com.color.pink.pojo.Archive">
+    SELECT archive.title, COUNT(*) AS articleNums FROM archive, article
+    WHERE archive.title = article.archive_title GROUP BY archive.title
+  </select>
 </mapper>

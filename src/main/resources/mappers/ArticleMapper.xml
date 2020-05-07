@@ -59,6 +59,9 @@
       <if test="key == 'is_reward'">
         is_reward = #{value}
       </if>
+      <if test="key == 'star'">
+        star = #{value }
+      </if>
     </foreach>
      WHERE id = #{id}
   </update>

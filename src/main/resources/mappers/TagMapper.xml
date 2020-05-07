@@ -83,4 +83,8 @@
   <select id="testTagForAdmin" resultType="java.lang.Integer" parameterType="java.lang.String">
     SELECT COUNT(*) FROM tag WHERE title = #{title}
   </select>
+
+  <select id="selectTagCount" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM tag
+  </select>
 </mapper>

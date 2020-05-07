@@ -32,6 +32,10 @@ public class TagService {
         return tagMapper.deleteInValidTag();
     }
 
+    public Integer selectTagCount() {
+        return tagMapper.selectTagCount();
+    }
+
     /**
      * 测试标签是否存在
      * @param title

@@ -26,5 +26,7 @@ public class Archive implements Serializable {
 
     private String imgUrl;
 
+    private int articleNums;
+
     private Set<Article> articles;
 }

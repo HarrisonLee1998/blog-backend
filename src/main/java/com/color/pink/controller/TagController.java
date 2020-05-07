@@ -23,6 +23,15 @@ public class TagController {
     @Autowired
     private TagService tagService;
 
+    @ApiOperation("查询所有标签数量")
+    @GetMapping("admin/tag/count")
+    public ResponseUtil selectTagCount() {
+        final var response = ResponseUtil.factory();
+        final var count = tagService.selectTagCount();
+        response.put("count", count);
+        return response;
+    }
+
     @ApiOperation("查询所有标签")
     @GetMapping(value = {"admin/tag", "tag"})
     public ResponseUtil selectAllTag(HttpServletRequest request) {

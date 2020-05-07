@@ -3,6 +3,7 @@ server:
   tomcat:
     remote-ip-header: X-Real-IP
     protocol-header: X-ForWarded-Proto
+  forward-headers-strategy: native
 spring:
   profiles:
     active: dev

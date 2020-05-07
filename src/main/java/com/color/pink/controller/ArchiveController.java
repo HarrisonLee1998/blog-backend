@@ -59,4 +59,19 @@ public class ArchiveController {
         }
         return response;
     }
+
+
+
+    @ApiOperation("获取归档及其文章数量，用于统计")
+    @GetMapping("admin/archive/article/count")
+    public ResponseUtil selectArchiveArticleNums(){
+        final var response = ResponseUtil.factory();
+        final var archives = archiveService.selectArchiveArticleNums();
+        if(Objects.nonNull(archives)) {
+            response.put("archives", archives);
+        } else {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return response;
+    }
 }

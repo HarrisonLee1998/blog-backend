@@ -43,4 +43,8 @@ public class ArchiveService {
     public Archive getArchiveByTitle(Boolean isAdmin, String archiveTitle) {
         return archiveMapper.getArchiveByTitle(isAdmin, archiveTitle);
     }
+
+    public List<Archive>selectArchiveArticleNums() {
+        return archiveMapper.selectArchiveArticleNums();
+    }
 }

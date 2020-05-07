@@ -14,8 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * @author HarrisonLee
@@ -27,6 +28,12 @@ public class ArticleController {
 
     @Autowired
     private ArticleService articleService;
+
+    private Map<String, Deque<LocalDateTime>>history = new HashMap<>();
+
+    private final Integer SEARCH_INTERVAL = 10;
+
+    private final Integer CLEAR_INTERVAL = 60;
 
     @ApiOperation("发布文章")
     @PostMapping("admin/article")
@@ -60,7 +67,7 @@ public class ArticleController {
     }
 
     @ApiOperation("更新部分文章信息")
-    @PatchMapping("admin/article")
+    @PatchMapping(value = {"admin/article", "article"})
     public ResponseUtil partialUpdateArticle(@RequestBody Map<String, Object>map) throws InterruptedException {
         var response = ResponseUtil.factory();
         String id = (String) map.get("id");
@@ -109,7 +116,13 @@ public class ArticleController {
         }
         var response = ResponseUtil.factory(HttpStatus.OK);
         if(request.getRequestURI().startsWith("/article")) {
-            articleService.searchDocs(pageUtil, keyword, true, true, true, false);
+            String ip = request.getRemoteAddr();
+            var b = checkSearch(ip);
+            if(b) {
+                articleService.searchDocs(pageUtil, keyword, true, true, true, false);
+            } else {
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS);
+            }
         }else if(request.getRequestURI().startsWith("/admin/article/recycle")) {
             articleService.searchDocs(pageUtil, keyword, false, false, true, true);
         }else{
@@ -117,6 +130,27 @@ public class ArticleController {
         }
         response.put("pageUtil", pageUtil);
         return response;
+    }
+
+    public boolean checkSearch(String ip) {
+        var queue = history.get(ip);
+        if(Objects.isNull(queue)) {
+            queue =  new ArrayDeque<>();
+            queue.addFirst(LocalDateTime.now());
+            history.put(ip, queue);
+        }
+        if(queue.size() > 2) {
+            var lastDate = queue.getFirst();
+            var duration = Duration.between(LocalDateTime.now(), lastDate);
+            if(duration.toMinutes() < SEARCH_INTERVAL) {
+                return false;
+            } else if(duration.toMinutes() > CLEAR_INTERVAL) {
+                queue.clear();
+            }
+        } else {
+            queue.addFirst(LocalDateTime.now());
+        }
+        return true;
     }
 
 

@@ -12,4 +12,5 @@ public interface ArchiveMapper {
     boolean addArchive(Archive archive);
     Archive getArchiveByTitle(@Param("isAdmin") Boolean isAdmin,
                               @Param("archiveTitle") String archiveTitle);
+    List<Archive>selectArchiveArticleNums();
 }
