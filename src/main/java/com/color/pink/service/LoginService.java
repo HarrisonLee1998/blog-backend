@@ -17,6 +17,12 @@ public class LoginService {
 
     private Map<String, String>info;
 
+    private boolean logined;
+
+    public String getUser() {
+        return logined ? info.get("username") : null;
+    }
+
     public String login(String username, String password) {
         if(Objects.isNull(info)) {
             final var b = readInfoFile();
@@ -25,10 +31,15 @@ public class LoginService {
             }
         }
         if(Objects.equals(username, info.get("username")) && Objects.equals(password, info.get("password"))){
+            logined = true;
             return getToken(username, password);
         } else {
             return null;
         }
+    }
+
+    public void logout() {
+        this.logined = false;
     }
 
     public String getToken(String username, String password) {
@@ -47,9 +58,9 @@ public class LoginService {
         return JWTUtil.verify(token, username, password);
     }
 
-    public boolean readInfoFile() {
+    private boolean readInfoFile() {
         final var properties = new Properties();
-        try(final var inputStream = this.getClass().getClassLoader().getResourceAsStream("login-info.properties")) {
+        try(final var inputStream = this.getClass().getClassLoader().getResourceAsStream("properties/login-info.properties")) {
             Objects.requireNonNull(inputStream);
             properties.load(inputStream);
             this.info = new HashMap<>();

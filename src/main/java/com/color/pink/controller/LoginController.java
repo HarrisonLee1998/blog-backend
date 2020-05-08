@@ -5,6 +5,7 @@ import com.color.pink.service.LoginService;
 import com.color.pink.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,16 +44,15 @@ public class LoginController {
         return res;
     }
 
+    @ApiOperation("登出")
+    @PostMapping("admin/logout")
+    public void logout(){
+        loginService.logout();
+    }
+
     @ApiOperation("验证token有效性")
-    @PostMapping("admin/token/check")
+    @GetMapping("auth/user")
     public ResponseUtil checkToken() {
-//        final var token = map.get("token");
-        final var response = ResponseUtil.factory();
-//        System.out.println(token);
-//        final var b = loginService.checkToken(token);
-//        if(!b) {
-//            response.setStatus(HttpStatus.UNAUTHORIZED);
-//        }
-        return response;
+        return ResponseUtil.factory().put("user", loginService.getUser());
     }
 }

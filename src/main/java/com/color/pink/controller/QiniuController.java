@@ -23,7 +23,7 @@ public class QiniuController {
     private QiniuService qiniuService;
 
     @ApiOperation("获取七牛上传文件的凭证")
-    @GetMapping("/admin/qiniu")
+    @GetMapping("/admin/qiniu/token")
     public ResponseUtil getQiniuToken(){
         var token = qiniuService.getQiniuToken();
         Objects.requireNonNull(token);

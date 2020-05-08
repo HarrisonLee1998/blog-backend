@@ -2,6 +2,8 @@ package com.color.pink.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,6 +23,8 @@ import java.util.*;
  */
 @Service
 public class StatisticsService {
+
+    private static Logger logger = LoggerFactory.getLogger(StatisticsService.class);
 
     private String ACCESS_TOKEN = "121.0a03f27c11c614fc51682e263c469dcb.Y7YLmLihAUy9xJ0CL8q5OBwmsh-ApxaFaspKf5L.i9FNwA";
 
@@ -152,18 +156,18 @@ public class StatisticsService {
     public boolean checkIsExisted(String fieldName){
         final var s = data.get(fieldName);
         if(Objects.isNull(s)) {
-            System.out.println("数据未存在，请求百度API");
+            logger.info("数据未存在，请求百度API");
             return false;
         }
         try {
             final var map = objectMapper.readValue(s, HashMap.class);
             final var result = (LinkedHashMap<String, List<String>>)map.get("result");
             final var timeSpans = result.get("timeSpan").get(0).split("-");
-            System.out.println("数据已存在");
+            logger.info("统计数据已存在");
             return formatDate(LocalDate.now().minusDays(1)).equals(timeSpans[1].trim().replaceAll("/", ""));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            System.out.println("数据未存在，数据未存在，请求百度API");
+            logger.info("数据未存在，数据未存在，请求百度API");
             return false;
         }
     }

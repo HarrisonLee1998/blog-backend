@@ -11,12 +11,17 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.model.BatchStatus;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author HarrisonLee
@@ -25,6 +30,8 @@ import java.util.Map;
 @Service
 public class QiniuService {
 
+    private static Logger logger = LoggerFactory.getLogger(QiniuService.class);
+
     private Qiniu qiniu;
 
     private Auth auth;
@@ -32,6 +39,10 @@ public class QiniuService {
     private Configuration cfg;
 
     private  BucketManager bucketManager;
+
+    private LocalDateTime lastGetTokenDateTime = null;
+
+    private String tokenCache = null;
 
     @Autowired
     public QiniuService(Qiniu Qiniu){
@@ -47,7 +58,17 @@ public class QiniuService {
      * @return
      */
     public String getQiniuToken(){
-        String qiniu_token=auth.uploadToken(qiniu.getBucket());
+        String qiniu_token;
+        if(Objects.nonNull(lastGetTokenDateTime)
+                && Duration.between(LocalDateTime.now(), lastGetTokenDateTime).toMinutes() < 40) {
+            logger.info("返回七牛token缓存");
+            qiniu_token = tokenCache;
+        }else {
+            logger.info("向七牛请求token");
+            qiniu_token=auth.uploadToken(qiniu.getBucket());
+            tokenCache = qiniu_token;
+            lastGetTokenDateTime = LocalDateTime.now();
+        }
         return qiniu_token;
     }
 

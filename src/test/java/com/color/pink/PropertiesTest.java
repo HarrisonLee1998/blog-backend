@@ -14,7 +14,7 @@ public class PropertiesTest {
     @Test
     public void test01(){
         final var properties = new Properties();
-        try(final var inputStream = this.getClass().getClassLoader().getResourceAsStream("login-info.properties")) {
+        try(final var inputStream = this.getClass().getClassLoader().getResourceAsStream("properties/login-info.properties")) {
             properties.load(inputStream);
             properties.forEach((key, value) -> {
                 System.out.println(key + " : " + value);

@@ -8,7 +8,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Objects;
 
 /**
  * @author HarrisonLee
@@ -23,25 +22,25 @@ public class LoginControl implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String uri = request.getRequestURI();
-        if(uri.startsWith("/admin") && !Objects.equals(uri, "/admin/login")) {
-            final var cookies = request.getCookies();
-            if(Objects.isNull(cookies)) {
-                response.setStatus(401);
-                return false;
-            }
-            String token = null;
-            for(var i = 0;i < cookies.length; ++i) {
-                if(cookies[i].getName().equals("token")) {
-                    token = cookies[i].getValue();
-                    break;
-                }
-            }
-            final var b = loginService.checkToken(token);
-            if(!b) {
-                response.setStatus(401);
-                return false;
-            }
-        }
+//        if(uri.startsWith("/admin") && !Objects.equals(uri, "/admin/login")) {
+//            final var cookies = request.getCookies();
+//            if(Objects.isNull(cookies)) {
+//                response.setStatus(401);
+//                return false;
+//            }
+//            String token = null;
+//            for(var i = 0;i < cookies.length; ++i) {
+//                if(cookies[i].getName().equals("token")) {
+//                    token = cookies[i].getValue();
+//                    break;
+//                }
+//            }
+//            final var b = loginService.checkToken(token);
+//            if(!b) {
+//                response.setStatus(401);
+//                return false;
+//            }
+//        }
         return true;
     }
 

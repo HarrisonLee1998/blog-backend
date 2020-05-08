@@ -25,7 +25,7 @@
     SELECT * FROM archive
   </select>
 
-  <select id="selectAllForAdmin" resultMap="BaseResultMap">
+  <select id="selectAllForAdmin" resultMap="BaseResultMap2">
     SELECT title, img_url, a_order
     FROM archive ORDER BY a_order
   </select>
