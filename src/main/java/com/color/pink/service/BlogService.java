@@ -27,6 +27,16 @@ public class BlogService {
         return tags;
     }
 
+    public int selectArticleNumsForTag(Boolean isAdmin, String tagId) {
+        var n = 0;
+        if(isAdmin) {
+            n = blogMapper.countArticleByTag(tagId);
+        } else {
+            n = blogMapper.countArticleByTag2(tagId);
+        }
+        return n;
+    }
+
     public boolean deleteBlogs(String artId, Set<String>tagIds) {
         return blogMapper.deleteBlogs(artId, tagIds);
     }

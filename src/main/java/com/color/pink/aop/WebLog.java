@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 /**
  * @author HarrisonLee
  * @date 2020/4/5 1:16
@@ -21,14 +19,14 @@ public class WebLog {
     private String description;
 
     /**
-     * 操作时间
+     * 开始
      */
-    private LocalDateTime startTime;
+    private String startTime;
 
     /**
      * 消耗时间
      */
-    private Integer spendTime;
+    private Long spendTime;
 
     /**
      * URI
@@ -50,8 +48,20 @@ public class WebLog {
      */
     private Object parameter;
 
-    /**
-     * 请求返回的结果
-     */
-    private Object result;
+
+    private String endTime;
+
+    @Override
+    public String toString() {
+        return "WebLog{" +
+                "api描述='" + description + '\'' +
+                ", 开始时间='" + startTime + '\'' +
+                ", 结束时间='" + endTime + '\'' +
+                ", 消耗时间=" + spendTime + "毫秒" +
+                ", uri='" + uri + '\'' +
+                ", HTTP方法='" + method + '\'' +
+                ", ip='" + ip + '\'' +
+                ", 方法参数=" + parameter +
+                '}';
+    }
 }

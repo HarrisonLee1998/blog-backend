@@ -1,7 +1,6 @@
 package com.color.pink.aop;
 
 import com.color.pink.annotation.ApiOperation;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -18,7 +17,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -51,28 +54,30 @@ public class WebLogAspect {
         var startTime = LocalDateTime.now();
         //获取当前请求对象
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
         //记录请求信息
-        var webLog = new WebLog();
         var result = joinPoint.proceed();
         var signature = joinPoint.getSignature();
         var methodSignature = (MethodSignature) signature;
         var method = methodSignature.getMethod();
         if (method.isAnnotationPresent(ApiOperation.class)) {
+            var webLog = new WebLog();
+            HttpServletRequest request = attributes.getRequest();
             ApiOperation apiOperation = method.getAnnotation(ApiOperation.class);
             webLog.setDescription(apiOperation.value());
+            webLog.setIp(request.getHeader("X-Real-IP"));
+            webLog.setMethod(request.getMethod());
+            webLog.setParameter(getParameter(method, joinPoint.getArgs()));
+            webLog.setUri(URLDecoder.decode(request.getRequestURI(), StandardCharsets.UTF_8));
+            webLog.setSpendTime(Duration.between(LocalDateTime.now(), startTime).toMillis());
+            webLog.setEndTime(formatDate(LocalDateTime.now()));
+            webLog.setStartTime(formatDate(startTime));
+            LOGGER.info("{}", webLog.toString());
         }
-        var endTime = LocalDateTime.now();
-        //webLog.setIp(request.getRemoteUser());
-        webLog.setMethod(request.getMethod());
-        webLog.setParameter(getParameter(method, joinPoint.getArgs()));
-        webLog.setResult(result);
-        //webLog.setSpendTime((int) (ChronoUnit.MILLIS.between(startTime, endTime)));
-        //webLog.setStartTime(startTime);
-        webLog.setUri(request.getRequestURI());
-        var mapper = new ObjectMapper();
-        LOGGER.info("{}", mapper.writeValueAsString(webLog));
         return result;
+    }
+
+    private String formatDate(LocalDateTime localDateTime) {
+        return DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(localDateTime);
     }
 
     /**

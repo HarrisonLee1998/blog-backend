@@ -23,6 +23,8 @@ public class TagController {
     @Autowired
     private TagService tagService;
 
+    private final String PROJECT_PREFIX = "/blog";
+
     @ApiOperation("查询所有标签数量")
     @GetMapping("admin/tag/count")
     public ResponseUtil selectTagCount() {
@@ -36,7 +38,7 @@ public class TagController {
     @GetMapping(value = {"admin/tag", "tag"})
     public ResponseUtil selectAllTag(HttpServletRequest request) {
         var response = ResponseUtil.factory(HttpStatus.OK);
-        var tags = tagService.selectAll(request.getRequestURI().startsWith("/admin"));
+        var tags = tagService.selectAll(request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin"));
         if (Objects.isNull(tags)) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -60,7 +62,7 @@ public class TagController {
             response.setStatus(HttpStatus.BAD_REQUEST);
             return  response;
         }
-        var pageInfo = tagService.selectAllByPage(request.getRequestURI().startsWith("/admin"),
+        var pageInfo = tagService.selectAllByPage(request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin"),
                 pageNo, pageSize, sortBy, sortDesc);
         if (Objects.isNull(pageInfo)) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -95,7 +97,7 @@ public class TagController {
     @GetMapping(value = {"admin/tag/test/{title}", "tag/test/{title}"})
     public ResponseUtil testTagByTitle(HttpServletRequest request, @PathVariable String title) {
         var response = ResponseUtil.factory();
-        var result = tagService.testTagByTitle(request.getRequestURI().startsWith("/admin"), title);
+        var result = tagService.testTagByTitle(request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin"), title);
         if(!result) {
             response.setStatus(HttpStatus.NOT_FOUND);
         }

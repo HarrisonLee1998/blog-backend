@@ -23,6 +23,8 @@ public class ArchiveController {
     @Autowired
     private ArchiveService archiveService;
 
+    private final String PROJECT_PREFIX = "/blog";
+
     @ApiOperation("添加归档")
     @PostMapping("admin/archive")
     public ResponseUtil addArchive(@Valid @RequestBody Archive archive){
@@ -31,46 +33,36 @@ public class ArchiveController {
     }
 
     @ApiOperation("查询所有归档(不查询附属文章)")
-    @GetMapping(value = {"archive"})
-    public ResponseUtil selectAllForClient(){
-        var archives = archiveService.selectAllForClient();
+    @GetMapping(value = {"admin/archive", "archive"})
+    public ResponseUtil selectAll(HttpServletRequest request){
+        var archives = archiveService.selectAll(request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin"));
         Objects.requireNonNull(archives);
         var response = ResponseUtil.factory();
         response.put("archives", archives);
         return response;
     }
-    @ApiOperation("Admin查询所有归档")
-    @GetMapping(value = {"admin/archive"})
-    public ResponseUtil selectAllForAdmin(){
-        var list = archiveService.selectAllForAdmin();
-        Objects.requireNonNull(list);
-        return ResponseUtil.factory(HttpStatus.OK).put("archives", list);
-    }
 
-    @ApiOperation("根据名称查询归档")
-    @GetMapping(value = {"admin/archive/{archiveTitle}", "archive/{archiveTitle}"})
-    public ResponseUtil getArchiveByTitle(HttpServletRequest request, @PathVariable String archiveTitle){
+    @ApiOperation("查询所有归档名称")
+    @GetMapping(value = {"admin/archive/title"})
+    public ResponseUtil selectAllTitle(HttpServletRequest request){
+        var archives = archiveService.selectAllTitle();
+        Objects.requireNonNull(archives);
         var response = ResponseUtil.factory();
-        var archive = archiveService.getArchiveByTitle(request.getRequestURI().startsWith("/admin"), archiveTitle);
-        if(Objects.isNull(archive)) {
-            response.setStatus(HttpStatus.NOT_FOUND);
-        } else {
-            response.put("archive", archive);
-        }
+        response.put("archives", archives);
         return response;
     }
 
 
 
-    @ApiOperation("获取归档及其文章数量，用于统计")
-    @GetMapping("admin/archive/article/count")
-    public ResponseUtil selectArchiveArticleNums(){
-        final var response = ResponseUtil.factory();
-        final var archives = archiveService.selectArchiveArticleNums();
-        if(Objects.nonNull(archives)) {
-            response.put("archives", archives);
+    @ApiOperation("根据名称查询归档")
+    @GetMapping(value = {"admin/archive/{archiveTitle}", "archive/{archiveTitle}"})
+    public ResponseUtil getArchiveByTitle(HttpServletRequest request, @PathVariable String archiveTitle){
+        var response = ResponseUtil.factory();
+        var archive = archiveService.getArchiveByTitle(request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin"), archiveTitle);
+        if(Objects.isNull(archive)) {
+            response.setStatus(HttpStatus.NOT_FOUND);
         } else {
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.put("archive", archive);
         }
         return response;
     }

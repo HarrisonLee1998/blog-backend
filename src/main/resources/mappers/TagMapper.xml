@@ -9,10 +9,22 @@
     <result property="articleNums" jdbcType="INTEGER" column="article_nums"/>
   </resultMap>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from tag
-    where id = #{id,jdbcType=CHAR}
-  </delete>
+  <resultMap id="AllForAdmin" type="com.color.pink.pojo.Tag">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
+    <collection property="articleNums" select="com.color.pink.dao.BlogMapper.countArticleByTag" column="id"/>
+  </resultMap>
+
+  <resultMap id="AllForClient" type="com.color.pink.pojo.Tag">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="view_times" jdbcType="INTEGER" property="viewTimes" />
+    <collection property="articleNums" select="com.color.pink.dao.BlogMapper.countArticleByTag2" column="id"/>
+  </resultMap>
+
   <delete id="deleteInValidTag">
     DELETE FROM tag
     WHERE id NOT IN
@@ -20,19 +32,6 @@
     SELECT DISTINCT tag_id FROM blog
     )
   </delete>
-  <insert id="insert" parameterType="com.color.pink.pojo.Tag">
-    insert into tag (id, title, create_date, 
-      view_times)
-    values (#{id,jdbcType=CHAR}, #{title,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
-      #{viewTimes,jdbcType=INTEGER})
-  </insert>
-  <update id="updateByPrimaryKey" parameterType="com.color.pink.pojo.Tag">
-    update tag
-    set title = #{title,jdbcType=VARCHAR},
-      create_date = #{createDate,jdbcType=TIMESTAMP},
-      view_times = #{viewTimes,jdbcType=INTEGER}
-    where id = #{id,jdbcType=CHAR}
-  </update>
 
   <update id="updateTitle" parameterType="com.color.pink.pojo.Tag">
     update tag
@@ -40,27 +39,33 @@
     where id = #{id,jdbcType=CHAR}
   </update>
 
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select id, title, create_date, view_times
+  <select id="selectByTitle" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select *
     from tag
-    where id = #{id,jdbcType=CHAR}
+    where title = #{title}
   </select>
+
 
   <select id="selectAllIdAndTitle" resultType="com.color.pink.pojo.Tag">
     SELECT id, title from tag
   </select>
-  <select id="selectAll" resultMap="BaseResultMap">
-    select t.id, t.title, t.create_date, t.view_times, COUNT(*) as article_nums
-    FROM tag as t, blog as b, article as a
-    WHERE t.id = b.tag_id AND a.id = b.art_id AND a.is_delete = 0
-    <if test="!isAdmin">
-      AND a.is_open = 1
-    </if>
-    GROUP BY t.id
+
+<!--  <select id="selectAll" resultMap="BaseResultMap">-->
+<!--    select t.id, t.title, t.create_date, t.view_times, COUNT(*) as article_nums-->
+<!--    FROM tag as t, blog as b, article as a-->
+<!--    WHERE t.id = b.tag_id AND a.id = b.art_id AND a.is_delete = 0-->
+<!--    <if test="!isAdmin">-->
+<!--      AND a.is_open = 1-->
+<!--    </if>-->
+<!--    GROUP BY t.id-->
+<!--  </select>-->
+
+  <select id="selectAllForAdmin" resultMap="AllForAdmin">
+    SELECT * FROM tag
   </select>
 
-  <select id="selectAllTagTitle" resultType="java.lang.String">
-    SELECT title FROM tag
+  <select id="selectAllForClient" resultMap="AllForClient">
+    SELECT * FROM tag
   </select>
 
   <insert id="addTags" parameterType="java.util.Set">

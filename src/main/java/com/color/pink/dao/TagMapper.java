@@ -12,15 +12,19 @@ public interface TagMapper {
     boolean updateTitle(Tag tag);
     int deleteInValidTag();
 
+    // 包括id, title, articleNums
     List<Tag> selectAll(Boolean isAdmin);
+
+    List<Tag> selectAllForAdmin();
+    List<Tag> selectAllForClient();
+
+    Tag selectByTitle(String title);
 
     @MapKey("title")
     Map<String, Tag>selectAllIdAndTitle();
 
     int testTagForClient(String title);
     int testTagForAdmin(String title);
-
-    Set<String> selectAllTagTitle();
 
     boolean addTags(@Param("tags") Set<Tag>tags);
 

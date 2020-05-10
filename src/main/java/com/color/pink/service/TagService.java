@@ -24,6 +24,9 @@ public class TagService {
     @Autowired
     private TagMapper tagMapper;
 
+    @Autowired
+    private BlogService blogService;
+
     public boolean updateTag(Tag tag){
        return tagMapper.updateTitle(tag);
     }
@@ -43,15 +46,21 @@ public class TagService {
      * @return
      */
     public boolean testTagByTitle(Boolean isAdmin, String title) {
-        if(isAdmin) {
-            return tagMapper.testTagForAdmin(title) > 0;
-        } else {
-            return tagMapper.testTagForClient(title) > 0;
+        final var tag = tagMapper.selectByTitle(title);
+        if(Objects.isNull(tag)) {
+            return false;
         }
+        final var i = blogService.selectArticleNumsForTag(isAdmin, tag.getId());
+        return i > 0;
     }
 
     public List<Tag> selectAll(Boolean isAdmin) {
-        var tags = tagMapper.selectAll(isAdmin);
+        List<Tag> tags = null;
+        if(isAdmin) {
+            tags = tagMapper.selectAllForAdmin();
+        } else {
+            tags = tagMapper.selectAllForClient();
+        }
         Objects.requireNonNull(tags);
 
         if(!isAdmin) {
@@ -95,11 +104,6 @@ public class TagService {
         return new PageInfo<>(tags);
     }
 
-    public Set<String>selectAllTagTitle(){
-        var titles = tagMapper.selectAllTagTitle();
-        Objects.requireNonNull(titles);
-        return titles;
-    }
 
     /**
      * 在发布文章时，可能需要添加标签

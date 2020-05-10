@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface ArticleMapper {
     int deleteByPrimaryKey(String id);
@@ -26,7 +25,9 @@ public interface ArticleMapper {
 
     List<Article>selectArticleByArchiveTitle(@Param("isAdmin") Boolean isAdmin,
                                              @Param("archiveTitle") String archiveTitle);
-    // 下面两个提供给查询归档时，查询归档文章时用的
-    Set<Article> selectArticleByArchive(String archive);
-    Set<Article> selectArticleByArchive2(String archive);
+
+    // 不能删
+    int countArticleNumsByArchive(String archive);
+    int countArticleNumsByArchive2(String archive);
+    // Set<Article> selectArticleByArchive2(String archive);
 }

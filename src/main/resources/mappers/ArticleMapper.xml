@@ -62,6 +62,9 @@
       <if test="key == 'star'">
         star = #{value }
       </if>
+      <if test="key == 'view_times'">
+        view_times = #{value}
+      </if>
     </foreach>
      WHERE id = #{id}
   </update>
@@ -90,13 +93,17 @@
     #{postDate}, #{lastUpdateDate}, #{archiveTitle}, #{isReward})
   </insert>
 
-  <select id="selectArticleByArchive" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
-    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_delete = 0 ORDER BY last_update_date DESC
+  <select id="countArticleNumsByArchive" parameterType="java.lang.String" resultType="java.lang.Integer">
+    SELECT count(id) FROM article WHERE archive_title = #{archive} AND is_delete = 0
   </select>
 
-  <select id="selectArticleByArchive2" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">
-    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0 ORDER BY last_update_date DESC
+  <select id="countArticleNumsByArchive2" parameterType="java.lang.String" resultType="java.lang.Integer">
+    SELECT count(id) FROM article WHERE archive_title = #{archive} AND is_delete = 0 AND is_open = 1
   </select>
+
+<!--  <select id="selectArticleByArchive2" parameterType="java.lang.String" resultType="com.color.pink.pojo.Article">-->
+<!--    SELECT id, title FROM article WHERE archive_title = #{archive} AND is_open = 1 AND is_delete = 0 ORDER BY last_update_date DESC-->
+<!--  </select>-->
 
   <select id="selectArticleByArchiveTitle" resultType="com.color.pink.pojo.Article">
     SELECT id, title, last_update_date FROM article

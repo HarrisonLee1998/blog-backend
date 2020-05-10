@@ -1,6 +1,7 @@
 package com.color.pink.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @ToString
 @JsonIgnoreProperties(value = { "handler" })
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Tag implements Serializable {
     private String id;
 

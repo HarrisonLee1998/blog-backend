@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <contextName>dev</contextName>
-    <property name="log.path" value="/var/logs/blog" />
+    <property name="log.path" value="/var/log/blog" />
     <property name="log.charset" value="UTF-8" />
     <!-- Log4j: [S][%d{yyyyMMdd HH:mm:ss}][%-5p][%C:%L] - %m%n -->
     <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
@@ -30,8 +30,8 @@
         <!-- 过滤掉Error信息 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->
             <level>WARN</level>
-            <!--            <onMatch>ACCEPT</onMatch>-->
-            <!--            <onMismatch>DENY</onMismatch>-->
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/error-%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -50,6 +50,6 @@
     <root level="INFO">
         <appender-ref ref="file-info" />
         <appender-ref ref="file-warn" />
-        <appender-ref ref="console" />
+<!--        <appender-ref ref="console" />-->
     </root>
 </configuration>

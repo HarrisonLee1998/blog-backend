@@ -6,8 +6,11 @@ import com.color.pink.service.ArticleService;
 import com.color.pink.util.PageUtil;
 import com.color.pink.util.ResponseUtil;
 import com.github.pagehelper.PageInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,9 +34,15 @@ public class ArticleController {
 
     private Map<String, Deque<LocalDateTime>>history = new HashMap<>();
 
+    private final Integer CLEAR_THRESHOLD_CAPACITY = 128;
+
     private final Integer SEARCH_INTERVAL = 10;
 
     private final Integer CLEAR_INTERVAL = 60;
+
+    private final String PROJECT_PREFIX = "/blog";
+
+    private static Logger logger = LoggerFactory.getLogger(ArticleController.class);
 
     @ApiOperation("发布文章")
     @PostMapping("admin/article")
@@ -92,9 +101,9 @@ public class ArticleController {
         pageUtil.setPageNo(pageNo);
         pageUtil.setPageSize(pageSize);
         var response = ResponseUtil.factory(HttpStatus.OK);
-        if(request.getRequestURI().startsWith("/article")) {
+        if(request.getRequestURI().startsWith(PROJECT_PREFIX + "/article")) {
             articleService.selectAll(pageUtil, true, true, true, false);
-        }else if(request.getRequestURI().startsWith("/admin/article/recycle")) {
+        }else if(request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin/article/recycle")) {
             articleService.selectAll(pageUtil, false, false, true, true);
         }else{
             articleService.selectAll(pageUtil, false, false, true, false);
@@ -115,7 +124,7 @@ public class ArticleController {
             pageUtil.setPageSize(Integer.MAX_VALUE - 1);
         }
         var response = ResponseUtil.factory(HttpStatus.OK);
-        if(request.getRequestURI().startsWith("/article")) {
+        if(request.getRequestURI().startsWith(PROJECT_PREFIX + "/article")) {
             String ip = request.getRemoteAddr();
             var b = checkSearch(ip);
             if(b) {
@@ -123,7 +132,7 @@ public class ArticleController {
             } else {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS);
             }
-        }else if(request.getRequestURI().startsWith("/admin/article/recycle")) {
+        }else if(request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin/article/recycle")) {
             articleService.searchDocs(pageUtil, keyword, false, false, true, true);
         }else{
             articleService.searchDocs(pageUtil, keyword,false, false, true, false);
@@ -132,34 +141,49 @@ public class ArticleController {
         return response;
     }
 
-    public boolean checkSearch(String ip) {
+    private boolean checkSearch(String ip) {
         var queue = history.get(ip);
         if(Objects.isNull(queue)) {
             queue =  new ArrayDeque<>();
-            queue.addFirst(LocalDateTime.now());
+            queue.addLast(LocalDateTime.now());
             history.put(ip, queue);
         }
-        if(queue.size() > 2) {
-            var lastDate = queue.getFirst();
-            var duration = Duration.between(LocalDateTime.now(), lastDate);
+        // 正在进行第四次查询
+        else if(queue.size() > 2) {
+            var lastDate = queue.getLast();
+            var duration = Duration.between(lastDate, LocalDateTime.now());
+            /**
+             * 距离上次搜索的时间不超过SEARCH_INTERVAL(现在为10分钟)，那么就拒绝搜索
+             */
             if(duration.toMinutes() < SEARCH_INTERVAL) {
                 return false;
-            } else if(duration.toMinutes() > CLEAR_INTERVAL) {
+            } else {
                 queue.clear();
             }
         } else {
-            queue.addFirst(LocalDateTime.now());
+            queue.addLast(LocalDateTime.now());
         }
         return true;
     }
 
+    /**
+     * 该方法的目的是为了防止大量不超过3次搜索的请求导致history过大
+     */
+    @Scheduled(cron = "* 0/5 * * * ? ")
+    public void clearSearchHistory(){
+        if(history.size() > CLEAR_THRESHOLD_CAPACITY) {
+            history.values()
+                    .removeIf(value -> Duration.between(value.getLast(),
+                            LocalDateTime.now()).toMinutes() > SEARCH_INTERVAL);
+        }
+    }
 
     @ApiOperation("根据ID查询文章")
     @GetMapping(value = {"admin/article/entry/{id}", "article/entry/{id}"})
     public ResponseUtil getArticleById(HttpServletRequest request, @PathVariable String id) throws IOException {
         var response = ResponseUtil.factory();
         Map<String, Object> article;
-        if(request.getRequestURI().startsWith("/admin")) {
+        if(request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin")) {
             // 对于管理端的访问，没有限制
             article = articleService.getArticleById(id, false, false, false, false);
         } else {
@@ -182,7 +206,7 @@ public class ArticleController {
                                               @PathVariable Integer pageSize) {
         var response = ResponseUtil.factory();
         PageInfo<Article> pageInfo;
-        var isAdmin = request.getRequestURI().startsWith("/admin");
+        var isAdmin = request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin");
         pageInfo = articleService.getArticlesByTagTitle(isAdmin, tagTitle, pageNo, pageSize);
         if(Objects.isNull(pageInfo) || pageInfo.getTotal() == 0) {
             response.setStatus(HttpStatus.NOT_FOUND);
@@ -201,7 +225,7 @@ public class ArticleController {
                                               @PathVariable Integer pageSize) {
         var response = ResponseUtil.factory();
         PageInfo<Article> pageInfo;
-        var isAdmin = request.getRequestURI().startsWith("/admin");
+        var isAdmin = request.getRequestURI().startsWith(PROJECT_PREFIX + "/admin");
         pageInfo = articleService.getArticlesByArchiveTitle(isAdmin, archiveTitle, pageNo, pageSize);
 //        if((Objects.isNull(pageInfo) || pageInfo.getTotal() == 0) && !isAdmin) {
 ////            response.setStatus(HttpStatus.NOT_FOUND);

@@ -6,11 +6,10 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface ArchiveMapper {
-    List<Archive> selectAll();
     List<Archive> selectAllForAdmin();
     List<Archive> selectAllForClient();
     boolean addArchive(Archive archive);
     Archive getArchiveByTitle(@Param("isAdmin") Boolean isAdmin,
                               @Param("archiveTitle") String archiveTitle);
-    List<Archive>selectArchiveArticleNums();
+    List<Archive>selectAllTitle();
 }

@@ -1,38 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.color.pink.dao.ArchiveMapper">
-  <resultMap id="BaseResultMap" type="com.color.pink.pojo.Archive">
+  <resultMap id="AllForAdmin" type="com.color.pink.pojo.Archive">
     <id column="title" jdbcType="VARCHAR" property="title" />
     <result column="a_order" jdbcType="INTEGER" property="order" />
     <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
-    <association property="articles" select="com.color.pink.dao.ArticleMapper.selectArticleByArchive" column="title"/>
+    <association property="articleNums" select="com.color.pink.dao.ArticleMapper.countArticleNumsByArchive" column="title"/>
   </resultMap>
 
-  <resultMap id="BaseResultMap2" type="com.color.pink.pojo.Archive">
+  <resultMap id="AllForClient" type="com.color.pink.pojo.Archive">
     <id column="title" jdbcType="VARCHAR" property="title" />
     <result column="a_order" jdbcType="INTEGER" property="order" />
     <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
-    <association property="articles" select="com.color.pink.dao.ArticleMapper.selectArticleByArchive2" column="title"/>
+    <association property="articleNums" select="com.color.pink.dao.ArticleMapper.countArticleNumsByArchive2" column="title"/>
   </resultMap>
 
-  <resultMap id="ResultMapWithoutArticle" type="com.color.pink.pojo.Archive">
-    <id column="title" jdbcType="VARCHAR" property="title" />
-    <result column="a_order" jdbcType="INTEGER" property="order" />
-    <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
-  </resultMap>
-
-  <select id="selectAll" resultMap="ResultMapWithoutArticle">
+  <select id="selectAllForAdmin" resultMap="AllForAdmin">
     SELECT * FROM archive
   </select>
 
-  <select id="selectAllForAdmin" resultMap="BaseResultMap2">
-    SELECT title, img_url, a_order
-    FROM archive ORDER BY a_order
+  <select id="selectAllForClient" resultMap="AllForClient">
+    SELECT * FROM archive
   </select>
 
-  <select id="selectAllForClient" resultMap="BaseResultMap2">
-    SELECT title, img_url, a_order
-    FROM archive ORDER BY a_order
+  <select id="selectAllTitle" resultType="com.color.pink.pojo.Archive">
+    select title from archive
   </select>
 
   <insert id="addArchive" parameterType="com.color.pink.pojo.Archive">
@@ -45,10 +37,5 @@
     <if test="!isAdmin">
       AND (SELECT COUNT(*) FROM article WHERE archive_title = #{archiveTitle} AND is_open = 1) > 0
     </if>
-  </select>
-
-  <select id="selectArchiveArticleNums" resultType="com.color.pink.pojo.Archive">
-    SELECT archive.title, COUNT(*) AS articleNums FROM archive, article
-    WHERE archive.title = article.archive_title GROUP BY archive.title
   </select>
 </mapper>

@@ -6,7 +6,7 @@ server:
   forward-headers-strategy: native
 spring:
   profiles:
-    active: dev
+    active: prod
   datasource:
     username: root
     password: LIzheng520!

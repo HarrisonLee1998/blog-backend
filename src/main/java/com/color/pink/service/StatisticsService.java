@@ -137,12 +137,12 @@ public class StatisticsService {
                 .GET()
                 .uri(URI.create(stringBuilder.toString()))
                 .build();
-        HttpResponse<String> response = null;
+        HttpResponse<String> response ;
         try {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return "";
+            return null;
         }
         Objects.requireNonNull(response);
         return response.body();
