@@ -11,7 +11,7 @@
     <groupId>com.color</groupId>
     <artifactId>pink</artifactId>
     <version>ultimate</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>pink</name>
     <description>this is harrison's blog</description>
 
@@ -36,6 +36,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>

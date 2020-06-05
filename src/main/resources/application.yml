@@ -6,10 +6,10 @@ server:
   forward-headers-strategy: native
 spring:
   profiles:
-    active: prod
+    active: dev
   datasource:
-    username: #
-    password: #
+    username: ENC(eIjJJ4k5QJPg1W6gCDfNGZKwgcaw3fizKIcEVWfrj4uUvIB5PK4jDN6Em9NieLC1)
+    password: ENC(ygNRobuqcsWi9+1I99rgKb1rHPt907THOt0dDWosN3KjnRmYfTsMp3EVaqVtw0qn)
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     #   数据源其他配置
@@ -29,8 +29,8 @@ spring:
   mail:
     properties.mail.smtp.ssl: true
     host: smtp.163.com
-    username: 13540441065@163.com
-    password: LIzheng520
+    username: ENC(wCNLxDvgij/aBZVKOkhXeh1RLvCsInaL7ZkOfpd3jN9+wXU/Vz/8/kmlJAjeG/XMHLXUs6yhGWAmBZt6vUKqLQ==)
+    password: ENC(PZuN6IyuAumgqn5wAvHvZ/vpECd1P+U9WORy90NkNOlIxhmwaZEwNVRED5Pmvnyq)
 
 mybatis:
   # 指定全局配置文件位置
@@ -40,10 +40,10 @@ mybatis:
   mapper-locations: classpath:mappers/*.xml
 
 qiniu:
-  Host: harrison-blog.s3-cn-east-1.qiniucs.com
-  AccessKey: s2isdTfRNsqvGvE3ysU58S0UWCMRflkYhapdJTC2
-  SecretKey: yeJfZJCiqai7L9yyU6KFfRdDNF4WUGOgtN-pRXzY
-  Bucket: harrison-blog
+  Host: ENC(u+UGWnQSgLWW2gfL1ElmZf0tfCC172O1FFlgf2j0pRpDjZri5JUAtWMA7jY4ujGonoEBs4ITmDkiFWte+JaAjONul3tWwJaHRjoDpe9xzVg=)
+  AccessKey: ENC(I+8+a2Wk63YiJvUWd3OtFTAQ5qgNsx0gIITzdHs79sxeVNNROOTUZ1S9gnZefs4VqPGK3SDqHNfgT4DKwLAcGghFRVpOySsSEkufjFjWSH4=)
+  SecretKey: ENC(eIAl6AuS2pSO+e/eQMePJaNHHIL6liF7h9SB8sNpwfdBlhT5Pj/DuttsTl853OvBtyRTb8ZRTg8FSclYLxgZSYlIk4OA4mM8Iw/H8FAYa+w=)
+  Bucket: ENC(FdfmHPtDbyUyiMfCsEDY36S4YSBQHDYy4GUPaweEtHuObPlVTJfuSS4uvtH9iE1G)
 pagehelper:
   helper-dialect: mysql
   reasonable: true

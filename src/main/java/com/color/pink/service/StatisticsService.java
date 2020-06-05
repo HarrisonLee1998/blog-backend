@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -15,6 +17,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -26,9 +29,24 @@ public class StatisticsService {
 
     private static Logger logger = LoggerFactory.getLogger(StatisticsService.class);
 
-    private String ACCESS_TOKEN = "121.0a03f27c11c614fc51682e263c469dcb.Y7YLmLihAUy9xJ0CL8q5OBwmsh-ApxaFaspKf5L.i9FNwA";
+    @Value("${baidu.tongji.access.token}")
+    private String accessToken;
 
-    private final String SITE_ID = "14958271";
+    private static LocalDate refreshTokenDate = LocalDate.now();
+
+    @Value("${baidu.tongji.code}")
+    private String code;
+
+    @Value("${baidu.tongji.refresh.token}")
+    private String refreshToken;
+
+    @Value("${baidu.tongji.client.id}")
+    private String clientId;
+
+    @Value("${baidu.tongji.client.secret}")
+    private String clientSecret;
+
+    private final String siteId = "14958271";
 
     private final String START_DATE = "20200501";
 
@@ -99,6 +117,7 @@ public class StatisticsService {
     }
 
     public String getData(LinkedHashMap<Object, Object>map){
+        refreshToken();
         // String START_DATE = "20200501";
         // String END_DATE = formatDate(LocalDate.now());
         // String METRICS = "pv_count";
@@ -110,8 +129,8 @@ public class StatisticsService {
         // String METHOD = "overview/getDistrictRpt";
 
         // var map = new LinkedHashMap<>();
-        map.put("access_token", ACCESS_TOKEN);
-        map.put("site_id", SITE_ID);
+        map.put("access_token", accessToken);
+        map.put("site_id", siteId);
 //        map.put("start_date", START_DATE);
 //        map.put("end_date", END_DATE);
 //        map.put("metrics", METRICS);
@@ -145,6 +164,7 @@ public class StatisticsService {
             return null;
         }
         Objects.requireNonNull(response);
+        logger.info(response.body());
         return response.body();
     }
 
@@ -169,6 +189,30 @@ public class StatisticsService {
             e.printStackTrace();
             logger.info("数据未存在，数据未存在，请求百度API");
             return false;
+        }
+    }
+
+    private void refreshToken() {
+        if(ChronoUnit.DAYS.between(refreshTokenDate, LocalDate.now()) > 20) {
+            String url = "http://openapi.baidu.com/oauth/2.0/token?grant_type=refresh_token&" +
+                    "refresh_token=" + refreshToken + "&" +
+                    "client_id=" +  clientId + "&" +
+                    "client_secret=" + clientSecret;
+            try {
+                var request = HttpRequest.newBuilder().uri(new URI(url)).GET().build();
+                var httpClient = HttpClient.newBuilder().build();
+                var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                System.out.println(response.body());
+                var map = objectMapper.readValue(response.body().getBytes(), HashMap.class);
+                map.forEach((key, value) -> {
+                    System.out.println(key + " : " + value);
+                });
+                accessToken = (String) map.get("access_token");
+                refreshToken = (String) map.get("refresh_token");
+                refreshTokenDate = LocalDate.now();
+            } catch (URISyntaxException | InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

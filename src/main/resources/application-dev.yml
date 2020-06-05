@@ -3,4 +3,4 @@ logging:
 spring:
   datasource:
     druid:
-      url: jdbc:mysql://#/blog?serverTimezone=Asia/Shanghai&useSSL=false&&characterEncoding=utf8&&useAffectedRows=true
+      url: jdbc:mysql://192.168.0.102/blog?serverTimezone=Asia/Shanghai&useSSL=false&&characterEncoding=utf8&&useAffectedRows=true
