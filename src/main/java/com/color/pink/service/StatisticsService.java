@@ -173,7 +173,7 @@ public class StatisticsService {
         return formatter.format(localDate);
     }
 
-    public boolean checkIsExisted(String fieldName){
+    private boolean checkIsExisted(String fieldName){
         final var s = data.get(fieldName);
         if(Objects.isNull(s)) {
             logger.info("数据未存在，请求百度API");

@@ -60,7 +60,7 @@ public class QiniuService {
     public String getQiniuToken(){
         String qiniu_token;
         if(Objects.nonNull(lastGetTokenDateTime)
-                && Duration.between(LocalDateTime.now(), lastGetTokenDateTime).toMinutes() < 40) {
+                && Duration.between(lastGetTokenDateTime, LocalDateTime.now()).toMinutes() < 40) {
             logger.info("返回七牛token缓存");
             qiniu_token = tokenCache;
         }else {
